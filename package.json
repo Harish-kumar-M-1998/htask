@@ -11,7 +11,7 @@
     "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
     "dev:api": "npm run dev --workspace=@htask/api",
     "dev:web": "npm run dev --workspace=@htask/web",
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build --workspace=@htask/shared && npm run build --workspace=@htask/api --workspace=@htask/web",
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "db:generate": "npm run db:generate --workspace=@htask/api",

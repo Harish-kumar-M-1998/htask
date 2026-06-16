@@ -48,6 +48,16 @@ export function createApp() {
     next();
   });
 
+  app.get('/', (_req, res) => {
+    res.json({
+      name: 'Htask API',
+      status: 'ok',
+      health: '/health',
+      api: config.API_PREFIX,
+      docs: '/api/docs',
+    });
+  });
+
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
