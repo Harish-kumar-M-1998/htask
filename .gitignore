@@ -31,12 +31,8 @@ Thumbs.db
 # Testing
 coverage/
 
-# Prisma
-apps/api/prisma/migrations/**/migration_lock.toml
-
-# Uploads
+# Uploads (runtime files only — not apps/api/src/services/storage source)
 uploads/
-storage/
 
 # Docker
 docker/data/
