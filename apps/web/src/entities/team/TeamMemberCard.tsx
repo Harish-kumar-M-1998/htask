@@ -1,26 +1,35 @@
 import { Calendar } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import { AvatarInitials, getInitials } from '@/shared/components/AvatarInitials';
 
 interface TeamMemberCardProps {
   member: {
+    id: string;
     firstName: string;
     lastName: string;
     email: string;
     createdAt: string;
     roles: Array<{ code: string; name: string }>;
   };
+  onClick?: (memberId: string) => void;
 }
 
-export function TeamMemberCard({ member }: TeamMemberCardProps) {
-  const initials = `${member.firstName[0] ?? ''}${member.lastName[0] ?? ''}`.toUpperCase();
+export function TeamMemberCard({ member, onClick }: TeamMemberCardProps) {
   const roleLabel = (member.roles[0]?.name ?? 'Member').toUpperCase();
+  const interactive = Boolean(onClick);
 
   return (
-    <div className="dashboard-card overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+    <button
+      type="button"
+      onClick={interactive ? () => onClick?.(member.id) : undefined}
+      className="dashboard-card overflow-hidden shadow-sm hover:shadow-md transition-shadow text-left w-full cursor-pointer disabled:cursor-default"
+      disabled={!interactive}
+    >
       <div className="flex items-center gap-3 p-5 min-w-0">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 text-sm font-bold dark:bg-slate-800 dark:text-slate-300">
-          {initials}
-        </div>
+        <AvatarInitials
+          initials={getInitials(member.firstName, member.lastName)}
+          size="lg"
+        />
         <div className="min-w-0 flex-1">
           <h3 className="font-semibold text-foreground truncate">
             {member.firstName} {member.lastName}
@@ -38,6 +47,6 @@ export function TeamMemberCard({ member }: TeamMemberCardProps) {
           Joined {formatDate(member.createdAt)}
         </span>
       </div>
-    </div>
+    </button>
   );
 }

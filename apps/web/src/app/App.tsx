@@ -14,6 +14,9 @@ const TaskDetailPage = lazy(() => import('@/pages/TaskDetailPage').then((m) => (
 const ProjectsPage = lazy(() => import('@/pages/ProjectsPage').then((m) => ({ default: m.ProjectsPage })));
 const ProjectDetailPage = lazy(() => import('@/pages/ProjectDetailPage').then((m) => ({ default: m.ProjectDetailPage })));
 const TeamPage = lazy(() => import('@/pages/TeamPage').then((m) => ({ default: m.TeamPage })));
+const MemberPerformancePage = lazy(() =>
+  import('@/pages/MemberPerformancePage').then((m) => ({ default: m.MemberPerformancePage })),
+);
 const ReportsPage = lazy(() => import('@/pages/ReportsPage').then((m) => ({ default: m.ReportsPage })));
 const AuditPage = lazy(() => import('@/pages/AuditPage').then((m) => ({ default: m.AuditPage })));
 const EmailSettingsPage = lazy(() => import('@/pages/EmailSettingsPage').then((m) => ({ default: m.EmailSettingsPage })));
@@ -108,6 +111,14 @@ export function App() {
                 element={
                   <Suspense fallback={<PageLoader />}>
                     <TeamPage />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="team/:id/performance"
+                element={
+                  <Suspense fallback={<PageLoader />}>
+                    <MemberPerformancePage />
                   </Suspense>
                 }
               />

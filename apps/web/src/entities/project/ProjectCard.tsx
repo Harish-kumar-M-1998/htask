@@ -1,4 +1,5 @@
 import { List, Users } from 'lucide-react';
+import { AvatarInitials } from '@/shared/components/AvatarInitials';
 
 export interface ProjectCardData {
   id: string;
@@ -28,9 +29,10 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
       className="dashboard-card w-full overflow-hidden p-5 text-left shadow-sm transition-shadow hover:shadow-md"
     >
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-neutral-900 text-sm font-bold text-white dark:bg-white dark:text-neutral-900">
-          {project.key?.[0]?.toUpperCase() ?? '?'}
-        </div>
+        <AvatarInitials
+          initials={project.key?.[0]?.toUpperCase() ?? '?'}
+          size="lg"
+        />
         <div className="min-w-0 flex-1">
           <h3 className="truncate font-semibold text-foreground">{project.name}</h3>
           <p className="text-xs uppercase tracking-wide text-muted-foreground">{project.key}</p>

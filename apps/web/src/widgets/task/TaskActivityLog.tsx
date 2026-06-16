@@ -48,13 +48,13 @@ export function TaskActivityLog({ history }: { history: HistoryEntry[] }) {
 
         return (
           <div key={entry.id} className="flex gap-3 py-3 first:pt-0">
-            <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
+            <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium text-foreground">{entry.actorName}</p>
               <p
                 className={
                   isTransition
-                    ? 'mt-0.5 font-mono text-sm text-emerald-600 dark:text-emerald-400'
+                    ? 'mt-0.5 font-mono text-sm text-primary'
                     : 'mt-0.5 text-sm text-muted-foreground'
                 }
               >

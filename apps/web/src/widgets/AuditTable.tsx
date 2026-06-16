@@ -26,11 +26,11 @@ const columnHelper = createColumnHelper<AuditLogRow>();
 
 const ACTION_COLORS: Record<string, string> = {
   TASK_TRANSITIONED: 'bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300',
-  TASK_CREATED: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300',
-  TASK_UPDATED: 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300',
+  TASK_CREATED: 'pill-brand',
+  TASK_UPDATED: 'bg-muted text-muted-foreground',
   TASK_DELETED: 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300',
-  PROJECT_CREATED: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300',
-  PROJECT_UPDATED: 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300',
+  PROJECT_CREATED: 'pill-brand',
+  PROJECT_UPDATED: 'bg-muted text-muted-foreground',
   PROJECT_DELETED: 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300',
   USER_LOGIN: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-300',
 };

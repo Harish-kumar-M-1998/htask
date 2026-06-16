@@ -113,7 +113,7 @@ export function AppLayout() {
             <Menu className="h-5 w-5" />
           </button>
           <div className="flex items-center gap-2 min-w-0">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-neutral-900 text-xs font-bold text-white dark:bg-white dark:text-neutral-900">
+            <div className="brand-tile h-7 w-7 rounded-full text-xs">
               H
             </div>
             <span className="truncate text-base font-bold tracking-tight">Htask</span>

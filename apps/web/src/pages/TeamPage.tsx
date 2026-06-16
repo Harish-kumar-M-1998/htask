@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router';
 import { Plus, Users, Search, Filter } from 'lucide-react';
 import { usersApi } from '@/services/api';
 import { useAuthStore } from '@/store';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
+import { FilterCountBadge } from '@/shared/components/FilterCountBadge';
 import { formToolbarClass } from '@/lib/formStyles';
 import { PageShell } from '@/shared/layouts/PageShell';
 import { TeamMemberCard } from '@/entities/team/TeamMemberCard';
@@ -22,6 +24,7 @@ type TeamMember = {
 };
 
 export function TeamPage() {
+  const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const canCreate = user?.permissions.includes('user:create');
   const [createOpen, setCreateOpen] = useState(false);
@@ -73,11 +76,7 @@ export function TeamPage() {
           >
             <Filter className="h-4 w-4" />
             Filters
-            {activeFilterCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 h-4 min-w-4 px-1 rounded-full bg-neutral-900 text-[10px] text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center">
-                {activeFilterCount}
-              </span>
-            )}
+            {activeFilterCount > 0 && <FilterCountBadge count={activeFilterCount} />}
           </Button>
         </div>
 
@@ -116,7 +115,11 @@ export function TeamPage() {
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 pb-1">
               {filteredMembers.map((member) => (
-                <TeamMemberCard key={member.id} member={member} />
+                <TeamMemberCard
+                  key={member.id}
+                  member={member}
+                  onClick={(memberId) => navigate(`/team/${memberId}/performance`)}
+                />
               ))}
             </div>
           )}

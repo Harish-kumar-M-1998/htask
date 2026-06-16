@@ -86,6 +86,8 @@ export const analyticsApi = {
   dashboard: (scope?: string) => api.get('/analytics/dashboard', { params: { scope } }),
   taskDistribution: (projectId?: string) =>
     api.get('/analytics/task-distribution', { params: { projectId } }),
+  memberPerformance: (memberId: string, from?: string, to?: string) =>
+    api.get(`/analytics/members/${memberId}/performance`, { params: { from, to } }),
   utilization: (from?: string, to?: string) =>
     api.get('/analytics/utilization', { params: { from, to } }),
 };

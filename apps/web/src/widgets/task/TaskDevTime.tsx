@@ -9,7 +9,7 @@ import {
 } from '@/lib/taskMetrics';
 
 const TONE_STYLES = {
-  good: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10',
+  good: 'text-primary bg-primary/10',
   warn: 'text-amber-600 dark:text-amber-400 bg-amber-500/10',
   bad: 'text-red-600 dark:text-red-400 bg-red-500/10',
   neutral: 'text-muted-foreground bg-muted',
@@ -77,7 +77,7 @@ export function TaskDevTime({ history, currentStatus, estimatedHours }: TaskDevT
                 <div
                   className={cn(
                     'h-full rounded-full transition-all',
-                    comparison.tone === 'good' && 'bg-emerald-500',
+                    comparison.tone === 'good' && 'progress-brand',
                     comparison.tone === 'warn' && 'bg-amber-500',
                     comparison.tone === 'bad' && 'bg-red-500',
                     comparison.tone === 'neutral' && 'bg-muted-foreground/40',

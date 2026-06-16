@@ -37,34 +37,45 @@ export function auditMiddleware(
   }
 
   const originalJson = res.json.bind(res);
+  const originalSend = res.send.bind(res);
+  let auditLogged = false;
+
+  const logAuditIfNeeded = () => {
+    if (auditLogged || res.statusCode >= 400 || !req.user) return;
+
+    const path = req.originalUrl.split('?')[0];
+    const action = mapMethodToAction(req.method, path);
+    if (!action) return;
+
+    const entityType = extractEntityType(path, action);
+    const entityId = extractEntityId(path, req.params as Record<string, string | string[] | undefined>);
+
+    auditLogged = true;
+    auditService
+      .log({
+        organizationId: req.user.organizationId,
+        userId: req.user.id,
+        action,
+        entityType,
+        entityId: entityId ?? 'system',
+        newValue: req.method !== 'DELETE' ? (req.body as Record<string, unknown>) : undefined,
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        requestId: req.requestId,
+      })
+      .catch(() => {
+        // Audit failures should not block response
+      });
+  };
 
   res.json = function (body: unknown) {
-    if (res.statusCode < 400 && req.user) {
-      const path = req.originalUrl.split('?')[0];
-      const action = mapMethodToAction(req.method, path);
-      if (action) {
-        const entityType = extractEntityType(path, action);
-        const entityId = extractEntityId(path, req.params as Record<string, string | string[] | undefined>);
-
-        auditService
-          .log({
-            organizationId: req.user.organizationId,
-            userId: req.user.id,
-            action,
-            entityType,
-            entityId: entityId ?? 'system',
-            newValue: req.method !== 'DELETE' ? (req.body as Record<string, unknown>) : undefined,
-            ipAddress: req.ip,
-            userAgent: req.headers['user-agent'],
-            requestId: req.requestId,
-          })
-          .catch(() => {
-            // Audit failures should not block response
-          });
-      }
-    }
-
+    logAuditIfNeeded();
     return originalJson(body);
+  };
+
+  res.send = function (body?: unknown) {
+    logAuditIfNeeded();
+    return originalSend(body);
   };
 
   next();
@@ -75,6 +86,7 @@ function mapMethodToAction(method: string, path: string): string | null {
 
   if (path.includes('/auth/login')) return 'USER_LOGIN';
   if (path.includes('/auth/logout')) return 'USER_LOGOUT';
+  if (path.includes('/notifications/email-config') && method === 'PATCH') return 'PERMISSION_UPDATED';
   if (path.includes('/transition')) return 'TASK_TRANSITIONED';
   if (path.includes('/comments')) return 'COMMENT_ADDED';
   if (path.includes('/attachments')) return 'FILE_UPLOADED';
@@ -110,7 +122,7 @@ const VALID_AUDIT_ACTIONS = new Set([
 ]);
 
 function shouldSkipAudit(path: string): boolean {
-  if (path.includes('/notifications/')) return true;
+  if (path.includes('/notifications/') && !path.includes('/notifications/email-config')) return true;
   return false;
 }
 

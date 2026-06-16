@@ -123,7 +123,7 @@ export function SidebarContent({
         )}
       >
         <div className={cn('flex items-center gap-3 min-w-0', collapsed && 'justify-center')}>
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-900 text-sm font-bold text-white dark:bg-white dark:text-neutral-900">
+          <div className="brand-tile h-8 w-8 rounded-full text-sm">
             H
           </div>
           {!collapsed && <span className="truncate text-lg font-bold tracking-tight">Htask</span>}

@@ -86,6 +86,27 @@
   .nav-active {
     @apply bg-primary text-primary-foreground;
   }
+  .avatar-initials {
+    @apply flex shrink-0 items-center justify-center bg-primary font-bold text-primary-foreground;
+  }
+  .badge-count {
+    @apply bg-primary text-primary-foreground;
+  }
+  .brand-tile {
+    @apply flex shrink-0 items-center justify-center bg-primary font-bold text-primary-foreground;
+  }
+  .pill-brand {
+    @apply bg-primary/10 text-primary;
+  }
+  .link-brand {
+    @apply text-primary transition-colors hover:text-primary/80;
+  }
+  .progress-brand {
+    @apply bg-primary;
+  }
+  .icon-tile-brand {
+    @apply bg-primary/10 text-primary;
+  }
 }
 
 /* Color theme accents */

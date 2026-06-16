@@ -18,6 +18,7 @@ import {
 import { exportTasksToCsv, exportTasksToXlsx, type ExportableTask } from '@/lib/exportTasks';
 import { PageShell } from '@/shared/layouts/PageShell';
 import { TablePagination } from '@/shared/components/TablePagination';
+import { FilterCountBadge } from '@/shared/components/FilterCountBadge';
 import { formToolbarClass } from '@/lib/formStyles';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 
@@ -108,11 +109,7 @@ export function TasksPage() {
       <Button variant="outline" size="sm" onClick={() => setFilterOpen(true)} className="relative">
         <Filter className="h-4 w-4" />
         Filters
-        {activeFilterCount > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 h-4 min-w-4 px-1 rounded-full bg-neutral-900 text-[10px] text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center">
-            {activeFilterCount}
-          </span>
-        )}
+        {activeFilterCount > 0 && <FilterCountBadge count={activeFilterCount} />}
       </Button>
 
       <DropdownMenu.Root>

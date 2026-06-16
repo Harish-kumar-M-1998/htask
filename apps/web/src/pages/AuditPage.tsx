@@ -13,6 +13,7 @@ import {
   emptyAuditFilters,
   type AuditFilters,
 } from '@/features/audit/auditFilters';
+import { FilterCountBadge } from '@/shared/components/FilterCountBadge';
 import { formToolbarClass } from '@/lib/formStyles';
 
 export function AuditPage() {
@@ -38,6 +39,9 @@ export function AuditPage() {
     queryKey: ['audit', page, limit, filters],
     queryFn: () =>
       auditApi.list({ page, limit, ...auditFiltersToParams(filters) }).then((r) => r.data),
+    staleTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
 
   const logs = (data?.data ?? []) as AuditLogRow[];
@@ -57,11 +61,7 @@ export function AuditPage() {
           <Button variant="outline" size="sm" onClick={() => setFilterOpen(true)} className="relative">
             <Filter className="h-4 w-4" />
             Filters
-            {activeFilterCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 h-4 min-w-4 px-1 rounded-full bg-neutral-900 text-[10px] text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center">
-                {activeFilterCount}
-              </span>
-            )}
+            {activeFilterCount > 0 && <FilterCountBadge count={activeFilterCount} />}
           </Button>
         </div>
       }

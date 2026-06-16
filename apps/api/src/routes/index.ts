@@ -130,6 +130,19 @@ router.get('/analytics/task-distribution', authenticate, requirePermission('anal
     res.json({ data });
   } catch (err) { next(err); }
 });
+router.get('/analytics/members/:id/performance', authenticate, requirePermission('analytics:view'), async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const from = req.query.from ? new Date(req.query.from as string) : undefined;
+    const to = req.query.to ? new Date(req.query.to as string) : undefined;
+    const data = await analyticsService.getMemberPerformance(
+      req.user!.organizationId,
+      param(req, 'id'),
+      from,
+      to,
+    );
+    res.json({ data });
+  } catch (err) { next(err); }
+});
 router.get('/analytics/utilization', authenticate, requirePermission('analytics:view'), async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const from = req.query.from ? new Date(req.query.from as string) : new Date(Date.now() - 7 * 86400000);

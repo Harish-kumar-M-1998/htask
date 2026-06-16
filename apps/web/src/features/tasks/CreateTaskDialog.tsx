@@ -18,9 +18,14 @@ const taskFormSchema = z.object({
   moduleId: z.string().optional(),
   type: z.enum(['FEATURE', 'ENHANCEMENT', 'BUG_FIX', 'SUPPORT']),
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']),
-  dueDate: z.string().optional(),
-  estimatedHours: z.union([z.coerce.number().min(0), z.literal('')]).optional(),
-  assigneeIds: z.array(z.string().uuid()).optional(),
+  dueDate: z.string().min(1, 'Deadline is required'),
+  estimatedHours: z
+    .string()
+    .min(1, 'ETA is required')
+    .refine((value) => !Number.isNaN(Number(value)) && Number(value) > 0, {
+      message: 'ETA must be greater than 0',
+    }),
+  assigneeIds: z.array(z.string().uuid()).min(1, 'Select at least one team member'),
 });
 
 type TaskFormValues = z.infer<typeof taskFormSchema>;
@@ -111,9 +116,9 @@ export function CreateTaskDialog({ open, onOpenChange, defaultProjectId }: Creat
         moduleId: values.moduleId || undefined,
         type: values.type,
         priority: values.priority,
-        dueDate: values.dueDate ? new Date(values.dueDate).toISOString() : undefined,
-        estimatedHours: values.estimatedHours === '' ? undefined : Number(values.estimatedHours),
-        assigneeIds: values.assigneeIds?.length ? values.assigneeIds : undefined,
+        dueDate: new Date(values.dueDate).toISOString(),
+        estimatedHours: Number(values.estimatedHours),
+        assigneeIds: values.assigneeIds,
       };
 
       const { data } = await tasksApi.create(payload);
@@ -230,17 +235,23 @@ export function CreateTaskDialog({ open, onOpenChange, defaultProjectId }: Creat
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium mb-1.5 block">Deadline</label>
+                  <label className="text-sm font-medium mb-1.5 block">Deadline *</label>
                   <Input {...register('dueDate')} type="date" />
+                  {errors.dueDate && (
+                    <p className="text-destructive text-xs mt-1">{errors.dueDate.message}</p>
+                  )}
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-1.5 block">ETA (hours)</label>
-                  <Input {...register('estimatedHours')} type="number" min={0} step={0.5} placeholder="e.g. 8" />
+                  <label className="text-sm font-medium mb-1.5 block">ETA (hours) *</label>
+                  <Input {...register('estimatedHours')} type="number" min={0.01} step={0.5} placeholder="e.g. 8" />
+                  {errors.estimatedHours && (
+                    <p className="text-destructive text-xs mt-1">{errors.estimatedHours.message}</p>
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="text-sm font-medium mb-1.5 block">Team Members</label>
+                <label className="text-sm font-medium mb-1.5 block">Team Members *</label>
                 <Controller
                   name="assigneeIds"
                   control={control}
@@ -276,6 +287,9 @@ export function CreateTaskDialog({ open, onOpenChange, defaultProjectId }: Creat
                     </div>
                   )}
                 />
+                {errors.assigneeIds && (
+                  <p className="text-destructive text-xs mt-1">{errors.assigneeIds.message}</p>
+                )}
               </div>
 
               <div>

@@ -10,7 +10,7 @@ export function UtilizationChart({ data, onAssignTask }: Props) {
   if (!data.length) {
     return (
       <div className="flex flex-col items-center justify-center text-center py-10 px-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 mb-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl icon-tile-brand mb-4">
           <BarChart3 className="h-6 w-6" />
         </div>
         <h3 className="text-sm font-semibold mb-2">No data to show yet</h3>
@@ -41,7 +41,7 @@ export function UtilizationChart({ data, onAssignTask }: Props) {
             </div>
             <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
               <div
-                className="h-full rounded-full bg-emerald-500 transition-all"
+                className="h-full rounded-full progress-brand transition-all"
                 style={{ width: `${pct}%` }}
               />
             </div>

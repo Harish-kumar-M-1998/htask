@@ -67,7 +67,7 @@ export function TaskDetailPage() {
         queryClient.invalidateQueries({ queryKey: ['project-tasks', task.projectId] });
         queryClient.invalidateQueries({ queryKey: ['project', task.projectId] });
       }
-      navigate(task?.projectId ? `/projects/${task.projectId}` : '/tasks');
+      navigate('/tasks');
     },
   });
 
@@ -112,7 +112,7 @@ export function TaskDetailPage() {
                 <span className="h-1.5 w-1.5 rounded-full bg-current opacity-80" />
                 {task.priority}
               </span>
-              <span className="rounded-md bg-blue-500/15 px-2 py-0.5 text-[11px] font-semibold tracking-wide text-blue-600 dark:text-blue-400">
+              <span className="rounded-md pill-brand px-2 py-0.5 text-[11px] font-semibold tracking-wide">
                 {formatTaskType(task.type)}
               </span>
             </div>
@@ -204,13 +204,13 @@ export function TaskDetailPage() {
             <div className="dashboard-card p-5">
               <h2 className="text-sm font-semibold mb-4">Project</h2>
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white text-sm font-bold">
+                <div className="brand-tile h-10 w-10 rounded-lg text-sm">
                   {task.project.key?.[0]}
                 </div>
                 <div className="min-w-0">
                   <Link
                     to={`/projects/${task.project.id}`}
-                    className="font-semibold hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate block"
+                    className="font-semibold link-brand hover:underline truncate block"
                   >
                     {task.project.name}
                   </Link>
@@ -219,7 +219,7 @@ export function TaskDetailPage() {
               </div>
               <Link
                 to={`/tasks?projectId=${task.project.id}`}
-                className="inline-flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 hover:underline mt-4"
+                className="inline-flex items-center gap-1.5 text-xs link-brand hover:underline mt-4"
               >
                 <FolderKanban className="h-3.5 w-3.5" />
                 View all project tasks

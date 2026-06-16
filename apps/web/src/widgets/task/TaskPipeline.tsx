@@ -40,7 +40,7 @@ export function TaskPipeline({ currentStatus }: TaskPipelineProps) {
         <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
           Pipeline position
         </p>
-        <p className="text-xs font-medium text-emerald-500 dark:text-emerald-400 whitespace-nowrap">
+        <p className="text-xs font-medium text-primary whitespace-nowrap">
           {completedCount} / {PIPELINE_MILESTONES.length} stages
           {terminal ? ' · terminal' : ''}
         </p>
@@ -62,7 +62,7 @@ export function TaskPipeline({ currentStatus }: TaskPipelineProps) {
                       isCurrentTerminal
                         ? 'border-foreground bg-foreground text-background'
                         : done
-                          ? 'border-emerald-500 bg-emerald-500 text-white'
+                          ? 'border-primary bg-primary text-primary-foreground'
                           : 'border-border bg-card text-transparent',
                     )}
                   >
@@ -81,9 +81,9 @@ export function TaskPipeline({ currentStatus }: TaskPipelineProps) {
                     className={cn(
                       'h-0.5 flex-1 mt-3.5 min-w-[8px] -mx-1',
                       currentIdx >= statusIndex(PIPELINE_MILESTONES[i + 1])
-                        ? 'bg-emerald-500'
+                        ? 'bg-primary'
                         : done
-                          ? 'bg-emerald-500'
+                          ? 'bg-primary'
                           : 'bg-border',
                     )}
                   />

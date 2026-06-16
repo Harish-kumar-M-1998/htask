@@ -49,9 +49,9 @@ export const createTaskSchema = z.object({
   type: z.enum(['FEATURE', 'ENHANCEMENT', 'BUG_FIX', 'SUPPORT']).default('FEATURE'),
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']).default('MEDIUM'),
   storyPoints: z.number().int().min(0).max(100).optional(),
-  dueDate: z.string().optional(),
-  estimatedHours: z.coerce.number().min(0).optional(),
-  assigneeIds: z.array(z.string().uuid()).optional(),
+  dueDate: z.string().min(1, 'Due date is required'),
+  estimatedHours: z.coerce.number().positive('ETA must be greater than 0'),
+  assigneeIds: z.array(z.string().uuid()).min(1, 'At least one team member is required'),
   labelNames: z.array(z.string()).optional(),
 });
 

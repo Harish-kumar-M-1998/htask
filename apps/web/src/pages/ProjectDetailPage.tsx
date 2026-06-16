@@ -21,15 +21,7 @@ import { AddModuleDialog } from '@/features/projects/AddModuleDialog';
 import { CreateTaskDialog } from '@/features/tasks/CreateTaskDialog';
 import { formatRelativeTime } from '@/lib/utils';
 import { cn } from '@/lib/utils';
-
-const MEMBER_AVATAR_COLORS = [
-  'bg-emerald-500',
-  'bg-blue-500',
-  'bg-violet-500',
-  'bg-amber-500',
-  'bg-rose-500',
-  'bg-cyan-500',
-];
+import { AvatarInitials, getInitials } from '@/shared/components/AvatarInitials';
 
 function ProjectStatusBadge({ status }: { status: string }) {
   const isActive = status === 'ACTIVE';
@@ -37,13 +29,13 @@ function ProjectStatusBadge({ status }: { status: string }) {
     <span
       className={cn(
         'inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide',
-        isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground',
+        isActive ? 'text-primary' : 'text-muted-foreground',
       )}
     >
       <span
         className={cn(
           'h-2 w-2 rounded-full',
-          isActive ? 'bg-emerald-500' : 'bg-muted-foreground',
+          isActive ? 'bg-primary' : 'bg-muted-foreground',
         )}
       />
       {status.replace(/_/g, ' ')}
@@ -58,7 +50,7 @@ function MemberRoleBadge({ role }: { role: string }) {
       className={cn(
         'shrink-0 rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide',
         isOwner
-          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400'
+          ? 'pill-brand'
           : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
       )}
     >
@@ -177,7 +169,7 @@ export function ProjectDetailPage() {
 
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between shrink-0">
         <div className="flex items-start gap-4 min-w-0">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-neutral-900 text-xl font-bold text-white dark:bg-white dark:text-neutral-900">
+          <div className="brand-tile h-14 w-14 rounded-xl text-xl">
             {project.key[0]?.toUpperCase()}
           </div>
           <div className="min-w-0">
@@ -246,7 +238,6 @@ export function ProjectDetailPage() {
                 {canCreateTask && (
                   <Button
                     size="sm"
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
                     onClick={() => setCreateTaskOpen(true)}
                   >
                     <Plus className="h-4 w-4" />
@@ -272,8 +263,8 @@ export function ProjectDetailPage() {
               </div>
             ) : projectTasks.length === 0 ? (
               <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center">
-                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 dark:bg-emerald-500/15">
-                  <List className="h-7 w-7 text-emerald-600 dark:text-emerald-400" />
+                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl icon-tile-brand">
+                  <List className="h-7 w-7" />
                 </div>
                 <h3 className="text-lg font-semibold">No tasks in this project yet</h3>
                 <p className="mt-2 max-w-md text-sm text-muted-foreground">
@@ -300,7 +291,7 @@ export function ProjectDetailPage() {
                 <button
                   type="button"
                   onClick={() => setEditOpen(true)}
-                  className="text-sm font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400"
+                  className="text-sm font-medium link-brand hover:underline"
                 >
                   + Invite
                 </button>
@@ -315,18 +306,12 @@ export function ProjectDetailPage() {
                       role: string;
                       user: { firstName: string; lastName: string; email: string };
                     },
-                    index: number,
                   ) => (
                     <div key={m.userId} className="flex items-center gap-3 px-5 py-3.5">
-                      <div
-                        className={cn(
-                          'flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white',
-                          MEMBER_AVATAR_COLORS[index % MEMBER_AVATAR_COLORS.length],
-                        )}
-                      >
-                        {m.user.firstName[0]}
-                        {m.user.lastName[0]}
-                      </div>
+                      <AvatarInitials
+                        initials={getInitials(m.user.firstName, m.user.lastName)}
+                        size="md"
+                      />
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-semibold truncate">
                           {m.user.firstName} {m.user.lastName}
@@ -347,7 +332,7 @@ export function ProjectDetailPage() {
             <h2 className="font-semibold mb-4">Activity</h2>
             {latestActivity ? (
               <div className="flex gap-3">
-                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
+                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
                 <div className="min-w-0">
                   <p className="text-sm leading-snug">
                     {latestActivity.description || latestActivity.action}
