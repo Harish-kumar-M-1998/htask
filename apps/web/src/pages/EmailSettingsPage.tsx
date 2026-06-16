@@ -304,7 +304,7 @@ export function EmailSettingsPage() {
                 <div className="mt-4 grid gap-3 md:grid-cols-3">
                   <div>
                     <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      ETA nearing
+                      ETA nearing (%)
                     </label>
                     <div className="relative">
                       <Input
@@ -318,14 +318,14 @@ export function EmailSettingsPage() {
                           )
                         }
                       />
-                      <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">
+                      {/* <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">
                         %
-                      </span>
+                      </span> */}
                     </div>
                   </div>
                   <div>
                     <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Due nearing
+                      Due nearing (days)
                     </label>
                     <div className="relative">
                       <Input
@@ -339,14 +339,14 @@ export function EmailSettingsPage() {
                           )
                         }
                       />
-                      <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">
+                      {/* <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">
                         days
-                      </span>
+                      </span> */}
                     </div>
                   </div>
                   <div>
                     <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Daily reminder hour
+                      Daily reminder hour (0-23)
                     </label>
                     <div className="relative">
                       <Input
@@ -360,9 +360,9 @@ export function EmailSettingsPage() {
                           )
                         }
                       />
-                      <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">
+                      {/* <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">
                         :00
-                      </span>
+                      </span> */}
                     </div>
                   </div>
                 </div>

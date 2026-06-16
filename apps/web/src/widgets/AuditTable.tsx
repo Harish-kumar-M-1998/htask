@@ -106,16 +106,16 @@ export function AuditTable({ logs, className }: AuditTableProps) {
           );
         },
       }),
-      columnHelper.display({
-        id: 'source',
-        header: 'Source',
-        cell: ({ row }) => (
-          <div className="text-xs text-muted-foreground max-w-[120px]">
-            <p className="truncate">{row.original.browser ?? '—'}</p>
-            <p className="truncate">{row.original.ipAddress ?? '—'}</p>
-          </div>
-        ),
-      }),
+      // columnHelper.display({
+      //   id: 'source',
+      //   header: 'Source',
+      //   cell: ({ row }) => (
+      //     <div className="text-xs text-muted-foreground max-w-[120px]">
+      //       <p className="truncate">{row.original.browser ?? '—'}</p>
+      //       <p className="truncate">{row.original.ipAddress ?? '—'}</p>
+      //     </div>
+      //   ),
+      // }),
     ],
     [],
   );
