@@ -1,0 +1,29 @@
+{
+  "name": "htask",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Enterprise Task & Workflow Management System",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api": "npm run dev --workspace=@htask/api",
+    "dev:web": "npm run dev --workspace=@htask/web",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "db:generate": "npm run db:generate --workspace=@htask/api",
+    "db:migrate": "npm run db:migrate --workspace=@htask/api",
+    "db:seed": "npm run db:seed --workspace=@htask/api",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

@@ -1,0 +1,428 @@
+/* Login — Minimal Motion */
+.login-page {
+  --login-bg: #f4f4f5;
+  --login-ink: #101113;
+  --login-ink-2: #5e616b;
+  --login-ink-3: #9a9da6;
+  --login-field-line: #d7d9de;
+  --login-accent: #101113;
+  --login-success: #15a06a;
+
+  font-family: Inter, system-ui, sans-serif;
+  background: var(--login-bg);
+  color: var(--login-ink);
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+.login-page button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+.login-page a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.login-page :focus-visible {
+  outline: 2px solid var(--login-accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.login-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.login-bg::before {
+  content: '';
+  position: absolute;
+  width: 680px;
+  height: 680px;
+  border-radius: 50%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(120, 130, 255, 0.1), transparent 60%);
+  animation: login-breathe 9s ease-in-out infinite;
+}
+
+@keyframes login-breathe {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.18);
+    opacity: 1;
+  }
+}
+
+.login-wrap {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 380px;
+  padding: 24px;
+  text-align: center;
+}
+
+.login-logo {
+  width: 62px;
+  height: 62px;
+  margin: 0 auto 20px;
+  opacity: 0;
+  animation: login-fade 0.5s ease 0.1s forwards;
+}
+
+.login-logo svg {
+  width: 100%;
+  height: 100%;
+}
+
+.login-logo .ring {
+  fill: none;
+  stroke: var(--login-ink);
+  stroke-width: 3;
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  animation: login-draw 1s ease 0.25s forwards;
+}
+
+.login-logo .h-mark {
+  fill: var(--login-ink);
+  opacity: 0;
+  animation: login-fade 0.5s ease 0.9s forwards;
+}
+
+@keyframes login-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.login-title {
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  opacity: 0;
+  animation: login-rise 0.6s ease 0.35s forwards;
+}
+
+.login-tag {
+  color: var(--login-ink-2);
+  font-size: 14px;
+  margin-top: 7px;
+  opacity: 0;
+  animation: login-rise 0.6s ease 0.45s forwards;
+}
+
+.login-card {
+  margin-top: 30px;
+  text-align: left;
+  opacity: 0;
+  animation: login-rise 0.6s ease 0.55s forwards;
+}
+
+.login-field {
+  margin-bottom: 22px;
+}
+
+.login-field.f1 {
+  opacity: 0;
+  animation: login-rise 0.5s ease 0.68s forwards;
+}
+
+.login-field.f2 {
+  opacity: 0;
+  animation: login-rise 0.5s ease 0.78s forwards;
+}
+
+.login-field label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--login-ink-2);
+  margin-bottom: 8px;
+  letter-spacing: 0.01em;
+}
+
+.login-ul {
+  position: relative;
+}
+
+.login-ul input {
+  width: 100%;
+  height: 40px;
+  border: none;
+  background: none;
+  font-size: 15px;
+  color: var(--login-ink);
+  padding: 4px 30px 8px 0;
+  border-bottom: 1.5px solid var(--login-field-line);
+}
+
+.login-ul input:focus {
+  outline: none;
+}
+
+.login-ul::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1.5px;
+  width: 100%;
+  background: var(--login-ink);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.login-ul:focus-within::after {
+  transform: scaleX(1);
+}
+
+.login-ul .login-eye {
+  position: absolute;
+  right: 0;
+  top: 6px;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  color: var(--login-ink-3);
+}
+
+.login-ul .login-eye:hover {
+  color: var(--login-ink);
+}
+
+.login-row {
+  display: flex;
+  justify-content: flex-end;
+  margin: -8px 0 24px;
+  opacity: 0;
+  animation: login-rise 0.5s ease 0.86s forwards;
+}
+
+.login-row a {
+  font-size: 13px;
+  color: var(--login-ink-2);
+  font-weight: 500;
+  position: relative;
+}
+
+.login-row a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: var(--login-ink);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.25s;
+}
+
+.login-row a:hover {
+  color: var(--login-ink);
+}
+
+.login-row a:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.login-btn {
+  width: 100%;
+  height: 50px;
+  border-radius: 12px;
+  background: var(--login-ink);
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  animation: login-rise 0.5s ease 0.94s forwards;
+  transition: transform 0.12s, box-shadow 0.25s, background 0.25s;
+}
+
+.login-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(16, 17, 19, 0.25);
+}
+
+.login-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.login-btn:disabled {
+  cursor: not-allowed;
+}
+
+.login-btn .sheen {
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+
+.login-btn:hover:not(:disabled) .sheen {
+  animation: login-sweep 0.8s ease;
+}
+
+@keyframes login-sweep {
+  from {
+    left: -60%;
+  }
+  to {
+    left: 130%;
+  }
+}
+
+.login-btn .lbl {
+  transition: opacity 0.2s;
+}
+
+.login-btn .spin {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+}
+
+.login-btn .spin svg {
+  width: 20px;
+  height: 20px;
+  animation: login-rot 0.7s linear infinite;
+}
+
+@keyframes login-rot {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.login-btn.loading .lbl {
+  opacity: 0;
+}
+
+.login-btn.loading .spin {
+  opacity: 1;
+}
+
+.login-btn.done {
+  background: var(--login-success);
+}
+
+.login-btn.done .lbl,
+.login-btn.done .spin {
+  opacity: 0;
+}
+
+.login-btn .ck {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+}
+
+.login-btn.done .ck {
+  opacity: 1;
+}
+
+.login-btn .ck svg {
+  width: 22px;
+  height: 22px;
+}
+
+.login-error {
+  color: #dc2626;
+  font-size: 13px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.login-field-error {
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.login-bot {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--login-ink-3);
+  opacity: 0;
+  animation: login-rise 0.5s ease 1s forwards;
+}
+
+.login-bot a {
+  color: var(--login-ink);
+  font-weight: 600;
+}
+
+@keyframes login-fade {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes login-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-page *,
+  .login-page *::before {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .login-logo,
+  .login-title,
+  .login-tag,
+  .login-card,
+  .login-field,
+  .login-row,
+  .login-btn,
+  .login-bot,
+  .login-logo .h-mark {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .login-logo .ring {
+    stroke-dashoffset: 0;
+  }
+}
