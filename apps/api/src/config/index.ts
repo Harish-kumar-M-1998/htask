@@ -27,6 +27,7 @@ const envSchema = z.object({
   SMTP_PASS: z.string().optional(),
   SMTP_FROM: z.string().default('harishmano98@gmail.com'),
   APP_URL: z.string().default('http://localhost:5173'),
+  DEFAULT_ORG_SLUG: z.string().default('htask-demo'),
   EMAIL_SCHEDULER_ENABLED: z.coerce.boolean().default(true),
   GRAYLOG_ENABLED: z.coerce.boolean().default(false),
   GRAYLOG_HOST: z.string().default('localhost'),

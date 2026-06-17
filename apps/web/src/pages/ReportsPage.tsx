@@ -13,6 +13,7 @@ import {
 } from '@/features/reports/reportOptions';
 import { formatDate, formatBytes } from '@/lib/utils';
 import { formToolbarClass } from '@/lib/formStyles';
+import { TableRowsSkeleton } from '@/shared/components/skeletons';
 
 interface ReportRow {
   id: string;
@@ -117,11 +118,7 @@ export function ReportsPage() {
 
         {isLoading ? (
           <div className="flex-1 overflow-hidden">
-            <div className="space-y-0 divide-y divide-border">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="h-16 bg-muted/40 animate-pulse" />
-              ))}
-            </div>
+            <TableRowsSkeleton rows={5} />
           </div>
         ) : reports.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center py-16 text-center px-6">

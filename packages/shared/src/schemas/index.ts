@@ -12,6 +12,27 @@ export const loginSchema = z.object({
   password: z.string().min(8),
 });
 
+export const registerSchema = z.object({
+  email: z.string().email(),
+  firstName: z.string().min(1).max(100),
+  lastName: z.string().min(1).max(100),
+});
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(8),
+    newPassword: z.string().min(8),
+    confirmPassword: z.string().min(8),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: 'New password must be different from current password',
+    path: ['newPassword'],
+  });
+
 export const refreshTokenSchema = z.object({
   refreshToken: z.string().min(1),
 });
@@ -91,6 +112,10 @@ export const createUserSchema = z.object({
   roleCodes: z.array(z.string()).min(1),
 });
 
+export const updateUserRolesSchema = z.object({
+  roleCodes: z.array(z.string()).min(1),
+});
+
 export const generateReportSchema = z.object({
   type: z.enum(['DAILY', 'WEEKLY', 'MONTHLY', 'QUARTERLY', 'YEARLY', 'CUSTOM']),
   format: z.enum(['PDF', 'EXCEL', 'CSV', 'JSON']),
@@ -128,7 +153,10 @@ export const emailAutomationConfigSchema = z.object({
 export type EmailAutomationConfig = z.infer<typeof emailAutomationConfigSchema>;
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;
+export type UpdateUserRolesInput = z.infer<typeof updateUserRolesSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+export type RegisterInput = z.infer<typeof registerSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;
 export type TaskTransitionInput = z.infer<typeof taskTransitionSchema>;

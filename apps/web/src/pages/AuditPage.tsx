@@ -7,6 +7,7 @@ import { Button } from '@/shared/ui/button';
 import { TablePagination } from '@/shared/components/TablePagination';
 import { AuditTable, type AuditLogRow } from '@/widgets/AuditTable';
 import { AuditFilterDialog } from '@/features/audit/AuditFilterDialog';
+import { TableRowsSkeleton } from '@/shared/components/skeletons';
 import {
   auditFiltersToParams,
   countActiveAuditFilters,
@@ -69,11 +70,7 @@ export function AuditPage() {
       <div className="flex flex-1 min-h-0 min-w-0 flex-col overflow-hidden dashboard-card">
         {isLoading ? (
           <div className="flex-1 overflow-hidden">
-            <div className="space-y-0 divide-y divide-border">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="h-14 bg-muted/40 animate-pulse" />
-              ))}
-            </div>
+            <TableRowsSkeleton rows={8} />
           </div>
         ) : (
           <AuditTable logs={logs} />

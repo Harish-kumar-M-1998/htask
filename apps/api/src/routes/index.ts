@@ -13,6 +13,7 @@ import {
   searchSchema,
   paginationSchema,
   createUserSchema,
+  updateUserRolesSchema,
   updateProjectSchema,
 } from '@htask/shared';
 import { projectController } from '../controllers/project.controller.js';
@@ -45,6 +46,8 @@ const router = Router();
 // Users
 router.get('/users', authenticate, requirePermission('user:read'), validate(paginationSchema, 'query'), userController.list);
 router.post('/users', authenticate, requirePermission('user:create'), validate(createUserSchema), userController.create);
+router.patch('/users/:id/roles', authenticate, requirePermission('user:manage_roles'), validate(updateUserRolesSchema), userController.updateRoles);
+router.delete('/users/:id', authenticate, requirePermission('user:delete'), userController.remove);
 
 // Projects
 router.get('/projects', authenticate, requirePermission('project:read'), validate(paginationSchema, 'query'), projectController.list);

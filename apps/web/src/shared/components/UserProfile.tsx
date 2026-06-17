@@ -1,13 +1,24 @@
+import { useNavigate } from 'react-router';
 import { useAuthStore } from '@/store';
 import { cn } from '@/lib/utils';
 import { AvatarInitials, getInitials } from '@/shared/components/AvatarInitials';
 
 export function UserProfile({ className, compact }: { className?: string; compact?: boolean }) {
+  const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const roleLabel = user?.roles[0]?.replace(/_/g, ' ') ?? '';
 
   return (
-    <div className={cn('flex items-center gap-2.5 px-3 py-3', compact && 'justify-center px-0 py-2', className)}>
+    <button
+      type="button"
+      onClick={() => navigate('/profile')}
+      className={cn(
+        'flex items-center gap-2.5 px-3 py-3 w-full rounded-lg transition-colors hover:bg-accent/60',
+        compact && 'justify-center px-0 py-2',
+        className,
+      )}
+      aria-label="Open profile"
+    >
       <AvatarInitials
         initials={getInitials(user?.firstName, user?.lastName)}
         size="md"
@@ -22,6 +33,6 @@ export function UserProfile({ className, compact }: { className?: string; compac
           </p>
         </div>
       )}
-    </div>
+    </button>
   );
 }

@@ -11,6 +11,7 @@ import { MemberEtaDistribution } from '@/widgets/team/MemberEtaDistribution';
 import { MemberProjectBreakdownTable } from '@/widgets/team/MemberProjectBreakdownTable';
 import { MemberCurrentWorkloadCard } from '@/widgets/team/MemberCurrentWorkloadCard';
 import { MemberRecentCompletions } from '@/widgets/team/MemberRecentCompletions';
+import { MemberPerformanceSkeleton } from '@/shared/components/skeletons';
 
 type MemberPerformancePayload = {
   member: {
@@ -89,7 +90,7 @@ export function MemberPerformancePage() {
   }
 
   if (isLoading) {
-    return <div className="h-full min-h-[220px] animate-pulse rounded-xl bg-muted" />;
+    return <MemberPerformanceSkeleton />;
   }
 
   if (isError || !data) {

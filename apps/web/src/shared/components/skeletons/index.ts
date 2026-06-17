@@ -1,0 +1,11 @@
+export { Skeleton } from '@/shared/ui/skeleton';
+export { TableRowsSkeleton } from './TableRowsSkeleton';
+export { CardGridSkeleton } from './CardGridSkeleton';
+export { DashboardSkeleton } from './DashboardSkeleton';
+export { TaskDetailSkeleton } from './TaskDetailSkeleton';
+export { ProjectDetailSkeleton } from './ProjectDetailSkeleton';
+export { MemberPerformanceSkeleton } from './MemberPerformanceSkeleton';
+export { EmailSettingsSkeleton } from './EmailSettingsSkeleton';
+export { SearchResultsSkeleton } from './SearchResultsSkeleton';
+export { PageRouteSkeleton } from './PageRouteSkeleton';
+export { KanbanSkeleton } from './KanbanSkeleton';

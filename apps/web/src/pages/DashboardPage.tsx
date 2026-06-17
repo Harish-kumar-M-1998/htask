@@ -8,6 +8,7 @@ import { TaskDistributionChart } from '@/widgets/charts/TaskDistributionChart';
 import { UtilizationChart } from '@/widgets/charts/UtilizationChart';
 import { ActivityFeed } from '@/widgets/ActivityFeed';
 import type { DashboardMetrics } from '@htask/shared';
+import { DashboardSkeleton, Skeleton } from '@/shared/components/skeletons';
 
 const metrics = [
   {
@@ -52,17 +53,21 @@ export function DashboardPage() {
     queryFn: () => analyticsApi.dashboard('manager').then((r) => r.data.data as DashboardMetrics),
   });
 
-  const { data: distribution } = useQuery({
+  const { data: distribution, isLoading: distributionLoading } = useQuery({
     queryKey: ['task-distribution'],
     queryFn: () => analyticsApi.taskDistribution().then((r) => r.data.data),
   });
 
-  const { data: utilization } = useQuery({
+  const { data: utilization, isLoading: utilizationLoading } = useQuery({
     queryKey: ['utilization'],
     queryFn: () => analyticsApi.utilization().then((r) => r.data.data),
   });
 
   const totalTasks = (distribution ?? []).reduce((sum: number, d: { count: number }) => sum + d.count, 0);
+
+  if (isLoading) {
+    return <DashboardSkeleton />;
+  }
 
   return (
     <PageShell title="Dashboard" subtitle="Real-time overview of your workspace">
@@ -79,9 +84,7 @@ export function DashboardPage() {
                 </span>
               </div>
               <p className="mt-4 text-sm text-muted-foreground">{m.label}</p>
-              <p className="mt-1 text-3xl font-bold tracking-tight">
-                {isLoading ? '—' : dashboard?.[m.key] ?? 0}
-              </p>
+              <p className="mt-1 text-3xl font-bold tracking-tight">{dashboard?.[m.key] ?? 0}</p>
             </div>
           ))}
         </div>
@@ -92,15 +95,40 @@ export function DashboardPage() {
               <h2 className="text-base font-semibold">Task status distribution</h2>
               <span className="text-xs text-muted-foreground">{totalTasks} tasks total</span>
             </div>
-            <TaskDistributionChart data={distribution ?? []} />
+            {distributionLoading ? (
+              <div className="flex items-center gap-8">
+                <Skeleton className="h-[200px] w-[200px] rounded-full shrink-0" />
+                <div className="flex-1 space-y-3">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <Skeleton key={i} className="h-8 w-full" />
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <TaskDistributionChart data={distribution ?? []} />
+            )}
           </div>
 
           <div className="dashboard-card p-6">
             <h2 className="text-base font-semibold mb-6">Team utilization</h2>
-            <UtilizationChart
-              data={utilization ?? []}
-              onAssignTask={() => navigate('/tasks')}
-            />
+            {utilizationLoading ? (
+              <div className="space-y-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="space-y-2">
+                    <div className="flex justify-between">
+                      <Skeleton className="h-4 w-28" />
+                      <Skeleton className="h-4 w-10" />
+                    </div>
+                    <Skeleton className="h-2 w-full rounded-full" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <UtilizationChart
+                data={utilization ?? []}
+                onAssignTask={() => navigate('/tasks')}
+              />
+            )}
           </div>
         </div>
 

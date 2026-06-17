@@ -4,6 +4,7 @@ import { Bell, Play, Send } from 'lucide-react';
 import { notificationsApi } from '@/services/api';
 import { useAuthStore } from '@/store';
 import { PageShell } from '@/shared/layouts/PageShell';
+import { EmailSettingsSkeleton } from '@/shared/components/skeletons';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Navigate } from 'react-router';
@@ -177,7 +178,7 @@ export function EmailSettingsPage() {
   }
 
   if (isLoading || !draft) {
-    return <div className="h-48 animate-pulse bg-muted rounded-xl" />;
+    return <EmailSettingsSkeleton />;
   }
 
   const toggle = (key: BooleanConfigKey) => {

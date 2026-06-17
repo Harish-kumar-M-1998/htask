@@ -13,6 +13,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { projectsApi, tasksApi } from '@/services/api';
+import { ProjectDetailSkeleton, TableRowsSkeleton } from '@/shared/components/skeletons';
 import { useAuthStore } from '@/store';
 import { Button } from '@/shared/ui/button';
 import { TaskTable } from '@/widgets/TaskTable';
@@ -145,7 +146,7 @@ export function ProjectDetailPage() {
   });
 
   if (isLoading) {
-    return <div className="h-full min-h-[320px] animate-pulse rounded-xl bg-muted" />;
+    return <ProjectDetailSkeleton />;
   }
 
   if (!project) {
@@ -255,11 +256,7 @@ export function ProjectDetailPage() {
 
             {tasksLoading ? (
               <div className="flex-1 overflow-hidden">
-                <div className="space-y-0 divide-y divide-border">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="h-14 bg-muted/40 animate-pulse" />
-                  ))}
-                </div>
+                <TableRowsSkeleton rows={5} />
               </div>
             ) : projectTasks.length === 0 ? (
               <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center">

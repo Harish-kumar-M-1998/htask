@@ -178,3 +178,26 @@ export function renderTestEmail() {
     html: layout('Test email', '<p>Your Htask email configuration is working.</p>'),
   };
 }
+
+export function renderWelcomeEmail(
+  user: UserEmailContext,
+  password: string,
+  loginUrl: string,
+) {
+  const name = user.firstName || 'there';
+  return {
+    subject: '[Htask] Welcome — your account is ready',
+    html: layout(
+      'Welcome to Htask',
+      `<p>Hi <strong>${name}</strong>,</p>
+       <p>Your Htask team member account has been created. Use the credentials below to sign in:</p>
+       <div style="background:#f4f4f5;border-radius:8px;padding:16px;margin:16px 0;font-size:14px">
+         <p style="margin:0 0 8px"><strong>Email:</strong> use the address you registered with</p>
+         <p style="margin:0"><strong>Temporary password:</strong> <code style="background:#e4e4e7;padding:2px 8px;border-radius:4px;font-size:15px">${password}</code></p>
+       </div>
+       <p>We recommend changing your password after your first login.</p>
+       <p><a href="${loginUrl}" style="display:inline-block;background:#ff9a3d;color:#1a1206;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600">Sign in to Htask</a></p>`,
+    ),
+    text: `Hi ${name},\n\nYour Htask account is ready.\n\nTemporary password: ${password}\n\nSign in: ${loginUrl}`,
+  };
+}

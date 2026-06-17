@@ -46,6 +46,7 @@ export const PERMISSIONS = {
   USER_READ: 'user:read',
   USER_CREATE: 'user:create',
   USER_UPDATE: 'user:update',
+  USER_DELETE: 'user:delete',
   USER_MANAGE_ROLES: 'user:manage_roles',
   WORKFLOW_READ: 'workflow:read',
   WORKFLOW_MANAGE: 'workflow:manage',

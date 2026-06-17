@@ -1,7 +1,7 @@
 import type { AuthUser } from '@htask/shared';
 import { ROLES } from '@htask/shared';
 
-export const TEAM_MEMBER_NAV_PATHS = ['/tasks', '/projects', '/search'] as const;
+export const TEAM_MEMBER_NAV_PATHS = ['/tasks', '/projects', '/search', '/profile'] as const;
 
 const ELEVATED_ROLES = [ROLES.MANAGER, ROLES.TEAM_LEAD, ROLES.PMO, ROLES.QA] as const;
 

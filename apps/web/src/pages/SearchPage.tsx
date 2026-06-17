@@ -6,6 +6,7 @@ import { searchApi } from '@/services/api';
 import { Input } from '@/shared/ui/input';
 import { formToolbarClass } from '@/lib/formStyles';
 import { Card, CardContent } from '@/shared/ui/card';
+import { SearchResultsSkeleton } from '@/shared/components/skeletons';
 
 export function SearchPage() {
   const [query, setQuery] = useState('');
@@ -37,9 +38,9 @@ export function SearchPage() {
         />
       </div>
 
-      {isFetching && <p className="text-sm text-muted-foreground text-center">Searching...</p>}
+      {isFetching && <SearchResultsSkeleton />}
 
-      {results.length > 0 && (
+      {!isFetching && results.length > 0 && (
         <Card>
           <CardContent className="pt-4">
             <div className="space-y-1">

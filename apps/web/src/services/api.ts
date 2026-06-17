@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AuthUser, TokenPair } from '@htask/shared';
+import type { AuthUser, TokenPair, UserProfileDetails } from '@htask/shared';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api/v1';
 
@@ -44,8 +44,15 @@ api.interceptors.response.use(
 export const authApi = {
   login: (email: string, password: string) =>
     api.post<{ user: AuthUser } & TokenPair>('/auth/login', { email, password }),
+  register: (data: { email: string; firstName: string; lastName: string }) =>
+    api.post<{ message: string; email: string; emailSent: boolean; emailError?: string }>(
+      '/auth/register',
+      data,
+    ),
   logout: (refreshToken: string) => api.post('/auth/logout', { refreshToken }),
-  me: () => api.get<{ data: AuthUser }>('/auth/me'),
+  me: () => api.get<{ data: UserProfileDetails }>('/auth/me'),
+  changePassword: (data: { currentPassword: string; newPassword: string; confirmPassword: string }) =>
+    api.post<{ success: boolean }>('/auth/change-password', data),
 };
 
 export const tasksApi = {
@@ -70,6 +77,8 @@ export const tasksApi = {
 export const usersApi = {
   list: (params?: Record<string, unknown>) => api.get('/users', { params }),
   create: (data: Record<string, unknown>) => api.post('/users', data),
+  updateRoles: (id: string, data: { roleCodes: string[] }) => api.patch(`/users/${id}/roles`, data),
+  remove: (id: string) => api.delete(`/users/${id}`),
 };
 
 export const projectsApi = {

@@ -10,6 +10,7 @@ import { TaskPipeline } from '@/widgets/task/TaskPipeline';
 import { TaskActivityLog, countActivities } from '@/widgets/task/TaskActivityLog';
 import { TaskDevTime } from '@/widgets/task/TaskDevTime';
 import { EditTaskDialog } from '@/features/tasks/EditTaskDialog';
+import { TaskDetailSkeleton } from '@/shared/components/skeletons';
 
 const PRIORITY_STYLES: Record<string, string> = {
   LOW: 'text-slate-500 bg-slate-500/15',
@@ -72,7 +73,7 @@ export function TaskDetailPage() {
   });
 
   if (isLoading) {
-    return <div className="h-full min-h-[200px] animate-pulse bg-muted rounded-xl" />;
+    return <TaskDetailSkeleton />;
   }
 
   if (!task) {

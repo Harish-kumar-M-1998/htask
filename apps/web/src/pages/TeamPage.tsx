@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import { Plus, Users, Search, Filter } from 'lucide-react';
 import { usersApi } from '@/services/api';
@@ -11,7 +11,9 @@ import { formToolbarClass } from '@/lib/formStyles';
 import { PageShell } from '@/shared/layouts/PageShell';
 import { TeamMemberCard } from '@/entities/team/TeamMemberCard';
 import { CreateTeamMemberDialog } from '@/features/team/CreateTeamMemberDialog';
+import { EditTeamMemberRoleDialog } from '@/features/team/EditTeamMemberRoleDialog';
 import { TeamFilterDialog, emptyTeamFilters, type TeamFilters } from '@/features/team/TeamFilterDialog';
+import { CardGridSkeleton } from '@/shared/components/skeletons';
 
 type TeamMember = {
   id: string;
@@ -25,16 +27,39 @@ type TeamMember = {
 
 export function TeamPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const user = useAuthStore((s) => s.user);
   const canCreate = user?.permissions.includes('user:create');
+  const canDelete = user?.permissions.includes('user:delete');
+  const canManageRoles = user?.permissions.includes('user:manage_roles');
   const [createOpen, setCreateOpen] = useState(false);
+  const [roleEditTarget, setRoleEditTarget] = useState<TeamMember | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState<TeamFilters>(emptyTeamFilters);
+  const [deleteTarget, setDeleteTarget] = useState<TeamMember | null>(null);
+  const [deleteError, setDeleteError] = useState('');
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['users', search],
     queryFn: () => usersApi.list({ search, limit: 100 }).then((r) => r.data),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => usersApi.remove(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      setDeleteTarget(null);
+      setDeleteError('');
+    },
+    onError: (err: unknown) => {
+      const apiMessage =
+        err && typeof err === 'object' && 'response' in err
+          ? (err as { response?: { data?: { error?: { message?: string } } } }).response?.data?.error
+              ?.message
+          : undefined;
+      setDeleteError(apiMessage ?? 'Failed to remove team member.');
+    },
   });
 
   const members = (data?.data ?? []) as TeamMember[];
@@ -80,6 +105,42 @@ export function TeamPage() {
           </Button>
         </div>
 
+        {deleteError && (
+          <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm shrink-0">
+            {deleteError}
+          </div>
+        )}
+
+        {deleteTarget && (
+          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm shrink-0 flex flex-wrap items-center justify-between gap-3">
+            <span>
+              Remove <strong>{deleteTarget.firstName} {deleteTarget.lastName}</strong> from the team?
+              They will lose access immediately.
+            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={deleteMutation.isPending}
+                onClick={() => deleteMutation.mutate(deleteTarget.id)}
+              >
+                {deleteMutation.isPending ? 'Removing...' : 'Yes, remove'}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={deleteMutation.isPending}
+                onClick={() => {
+                  setDeleteTarget(null);
+                  setDeleteError('');
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+
         {isError && (
           <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm shrink-0">
             Failed to load team members.{' '}
@@ -89,11 +150,7 @@ export function TeamPage() {
 
         <div className="flex-1 min-h-0 min-w-0 overflow-y-auto overflow-x-hidden">
           {isLoading ? (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="h-[120px] rounded-xl bg-muted animate-pulse" />
-              ))}
-            </div>
+            <CardGridSkeleton count={8} variant="team" />
           ) : filteredMembers.length === 0 ? (
             <div className="text-center py-16">
               <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -119,6 +176,23 @@ export function TeamPage() {
                   key={member.id}
                   member={member}
                   onClick={(memberId) => navigate(`/team/${memberId}/performance`)}
+                  onDelete={
+                    canDelete && member.id !== user?.id
+                      ? (memberId) => {
+                          const target = filteredMembers.find((m) => m.id === memberId) ?? null;
+                          setDeleteError('');
+                          setDeleteTarget(target);
+                        }
+                      : undefined
+                  }
+                  onEditRole={
+                    canManageRoles && member.id !== user?.id
+                      ? (memberId) => {
+                          const target = filteredMembers.find((m) => m.id === memberId) ?? null;
+                          setRoleEditTarget(target);
+                        }
+                      : undefined
+                  }
                 />
               ))}
             </div>
@@ -127,6 +201,12 @@ export function TeamPage() {
       </div>
 
       <CreateTeamMemberDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <EditTeamMemberRoleDialog
+        member={roleEditTarget}
+        onOpenChange={(open) => {
+          if (!open) setRoleEditTarget(null);
+        }}
+      />
       <TeamFilterDialog
         open={filterOpen}
         onOpenChange={setFilterOpen}

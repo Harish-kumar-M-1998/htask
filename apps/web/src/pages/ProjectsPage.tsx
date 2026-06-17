@@ -9,6 +9,7 @@ import { Button } from '@/shared/ui/button';
 import { CreateProjectDialog } from '@/features/projects/CreateProjectDialog';
 import { PageShell } from '@/shared/layouts/PageShell';
 import { ProjectCard, type ProjectCardData } from '@/entities/project/ProjectCard';
+import { CardGridSkeleton } from '@/shared/components/skeletons';
 
 export function ProjectsPage() {
   const navigate = useNavigate();
@@ -45,11 +46,7 @@ export function ProjectsPage() {
       )}
 
       {isLoading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-[196px] rounded-xl bg-muted animate-pulse" />
-          ))}
-        </div>
+        <CardGridSkeleton count={4} variant="project" />
       ) : projects.length === 0 ? (
         <div className="text-center py-16">
           <FolderKanban className="h-12 w-12 mx-auto text-muted-foreground mb-4" />

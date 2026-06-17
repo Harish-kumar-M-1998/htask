@@ -17,6 +17,19 @@ export const authController = {
     }
   },
 
+  async register(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const result = await authService.register(
+        req.body,
+        req.ip,
+        req.headers['user-agent'],
+      );
+      res.status(201).json(result);
+    } catch (err) {
+      next(err);
+    }
+  },
+
   async refresh(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const result = await authService.refresh(req.body.refreshToken);
@@ -43,6 +56,22 @@ export const authController = {
     try {
       const user = await authService.getMe(req.user!.id);
       res.json({ data: user });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async changePassword(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      await authService.changePassword(
+        req.user!.id,
+        req.user!.organizationId,
+        req.body.currentPassword,
+        req.body.newPassword,
+        req.ip,
+        req.headers['user-agent'],
+      );
+      res.json({ success: true });
     } catch (err) {
       next(err);
     }

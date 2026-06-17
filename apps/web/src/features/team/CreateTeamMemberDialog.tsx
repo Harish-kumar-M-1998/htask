@@ -8,14 +8,7 @@ import { usersApi } from '@/services/api';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { selectClassName } from '@/lib/formStyles';
-
-const ROLES = [
-  { code: 'TEAM_MEMBER', label: 'Team Member' },
-  { code: 'TEAM_LEAD', label: 'Team Lead' },
-  { code: 'MANAGER', label: 'Manager' },
-  { code: 'PMO', label: 'PMO' },
-  { code: 'QA', label: 'QA Team' },
-];
+import { TEAM_ROLE_OPTIONS } from './teamRoles';
 
 interface CreateTeamMemberDialogProps {
   open: boolean;
@@ -101,7 +94,7 @@ export function CreateTeamMemberDialog({ open, onOpenChange }: CreateTeamMemberD
                 onChange={(e) => setValue('roleCodes', [e.target.value])}
                 className={selectClass}
               >
-                {ROLES.map((r) => (
+                {TEAM_ROLE_OPTIONS.map((r) => (
                   <option key={r.code} value={r.code}>{r.label}</option>
                 ))}
               </select>

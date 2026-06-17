@@ -30,6 +30,12 @@ export interface AuthUser {
   permissions: string[];
 }
 
+export interface UserProfileDetails extends AuthUser {
+  avatar?: string | null;
+  lastLoginAt?: string | null;
+  createdAt: string;
+}
+
 export interface TokenPair {
   accessToken: string;
   refreshToken: string;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router';
 import { Plus, Filter, ListTodo, Download, ChevronDown } from 'lucide-react';
@@ -6,8 +6,9 @@ import { tasksApi, projectsApi, usersApi } from '@/services/api';
 import { useAuthStore } from '@/store';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
-import { TaskTable } from '@/widgets/TaskTable';
+import { TaskKanbanBoard } from '@/widgets/TaskKanbanBoard';
 import { CreateTaskDialog } from '@/features/tasks/CreateTaskDialog';
+import { KanbanSkeleton } from '@/shared/components/skeletons';
 import {
   TaskFilterDialog,
   filtersFromSearchParams,
@@ -17,10 +18,12 @@ import {
 } from '@/features/tasks/TaskFilterDialog';
 import { exportTasksToCsv, exportTasksToXlsx, type ExportableTask } from '@/lib/exportTasks';
 import { PageShell } from '@/shared/layouts/PageShell';
-import { TablePagination } from '@/shared/components/TablePagination';
 import { FilterCountBadge } from '@/shared/components/FilterCountBadge';
 import { formToolbarClass } from '@/lib/formStyles';
+import type { KanbanTask } from '@/entities/task/KanbanTaskCard';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+
+const KANBAN_TASK_LIMIT = 200;
 
 async function fetchAllFilteredTasks(
   search: string,
@@ -42,21 +45,16 @@ async function fetchAllFilteredTasks(
 export function TasksPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(20);
   const [createOpen, setCreateOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const canCreate = user?.permissions.includes('task:create');
+  const canTransition = user?.permissions.includes('task:transition');
 
   const filters = filtersFromSearchParams(searchParams);
   const activeFilterCount = Object.values(filters).filter(Boolean).length;
-
-  useEffect(() => {
-    setPage(1);
-  }, [search, searchParams.toString()]);
 
   const { data: projectsData } = useQuery({
     queryKey: ['projects'],
@@ -72,21 +70,19 @@ export function TasksPage() {
   const users = usersData?.data ?? [];
 
   const { data, isLoading } = useQuery({
-    queryKey: ['tasks', search, filters, page, limit],
+    queryKey: ['tasks', search, filters],
     queryFn: () =>
-      tasksApi.list(buildTaskListParams(search, filters, page, limit)).then((r) => r.data),
+      tasksApi
+        .list(buildTaskListParams(search, filters, 1, KANBAN_TASK_LIMIT))
+        .then((r) => r.data),
   });
 
-  const tasks = data?.data ?? [];
-  const meta = data?.meta ?? { page: 1, limit: 20, total: 0, totalPages: 0 };
+  const tasks = (data?.data ?? []) as KanbanTask[];
+  const meta = data?.meta ?? { page: 1, limit: KANBAN_TASK_LIMIT, total: 0, totalPages: 0 };
+  const hasMoreTasks = meta.total > tasks.length;
 
   const applyFilters = (next: TaskFilters) => {
     setSearchParams(searchParamsFromFilters(next));
-  };
-
-  const handleLimitChange = (nextLimit: number) => {
-    setLimit(nextLimit);
-    setPage(1);
   };
 
   const handleExport = async (format: 'csv' | 'xlsx') => {
@@ -153,30 +149,35 @@ export function TasksPage() {
   return (
     <PageShell
       title="Tasks"
-      subtitle={`${meta.total} tasks total${activeFilterCount > 0 ? ` · ${activeFilterCount} filter${activeFilterCount > 1 ? 's' : ''} applied` : ''}`}
+      subtitle={`${meta.total} tasks · Kanban board${activeFilterCount > 0 ? ` · ${activeFilterCount} filter${activeFilterCount > 1 ? 's' : ''}` : ''}`}
       action={pageActions}
     >
       <div className="flex flex-1 min-h-0 min-w-0 flex-col gap-4">
-        <div className={`shrink-0 max-w-sm ${formToolbarClass}`}>
+        <div className={`shrink-0 flex flex-col sm:flex-row sm:items-center gap-3 ${formToolbarClass}`}>
           <Input
             placeholder="Search tasks..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="max-w-sm"
           />
+          {canTransition && (
+            <p className="text-xs text-muted-foreground">
+              Drag cards between columns to update status
+            </p>
+          )}
         </div>
 
-        <div className="flex flex-1 min-h-0 min-w-0 flex-col overflow-hidden dashboard-card">
+        {hasMoreTasks && (
+          <p className="text-xs text-amber-600 dark:text-amber-400 shrink-0">
+            Showing first {tasks.length} of {meta.total} tasks. Narrow filters to see more on the board.
+          </p>
+        )}
+
+        <div className="flex flex-1 min-h-0 min-w-0 flex-col overflow-hidden">
           {isLoading ? (
-            <div className="flex-1 overflow-hidden">
-              <div className="space-y-0 divide-y divide-border">
-                {Array.from({ length: limit }).map((_, i) => (
-                  <div key={i} className="h-14 bg-muted/40 animate-pulse" />
-                ))}
-              </div>
-            </div>
+            <KanbanSkeleton />
           ) : tasks.length === 0 ? (
-            <div className="flex flex-1 flex-col items-center justify-center py-16">
+            <div className="flex flex-1 flex-col items-center justify-center py-16 dashboard-card">
               <ListTodo className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="font-semibold text-lg">No tasks found</h3>
               <p className="text-muted-foreground text-sm mt-1 mb-4">
@@ -194,17 +195,12 @@ export function TasksPage() {
               )}
             </div>
           ) : (
-            <TaskTable tasks={tasks} onRowClick={(id) => navigate(`/tasks/${id}`)} />
+            <TaskKanbanBoard
+              tasks={tasks}
+              onTaskClick={(id) => navigate(`/tasks/${id}`)}
+              canTransition={canTransition}
+            />
           )}
-
-          <TablePagination
-            page={meta.page}
-            limit={meta.limit}
-            total={meta.total}
-            totalPages={meta.totalPages}
-            onPageChange={setPage}
-            onLimitChange={handleLimitChange}
-          />
         </div>
 
         <CreateTaskDialog open={createOpen} onOpenChange={setCreateOpen} />
