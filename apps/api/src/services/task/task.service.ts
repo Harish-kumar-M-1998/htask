@@ -75,9 +75,14 @@ class TaskService {
     return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
   }
 
-  async findById(id: string) {
-    const task = await prisma.task.findUnique({
-      where: { id },
+  async findById(id: string, organizationId?: string) {
+    const where: Prisma.TaskWhereInput = { id };
+    if (organizationId) {
+      where.project = { organizationId };
+    }
+
+    const task = await prisma.task.findFirst({
+      where,
       include: {
         assignees: { include: { user: true } },
         module: true,
@@ -174,8 +179,9 @@ class TaskService {
     userId: string,
     permissions: string[],
     actorName: string,
+    organizationId?: string,
   ) {
-    const task = await this.findById(id);
+    const task = await this.findById(id, organizationId);
 
     const canUpdate =
       permissions.includes('task:update') ||
@@ -254,8 +260,8 @@ class TaskService {
     return updated;
   }
 
-  async softDelete(id: string, userId: string, permissions: string[], actorName: string) {
-    const task = await this.findById(id);
+  async softDelete(id: string, userId: string, permissions: string[], actorName: string, organizationId?: string) {
+    const task = await this.findById(id, organizationId);
 
     const canDelete =
       permissions.includes('task:delete') ||
@@ -284,8 +290,8 @@ class TaskService {
     return task;
   }
 
-  async addComment(taskId: string, userId: string, content: string, actorName: string, parentId?: string) {
-    await this.findById(taskId);
+  async addComment(taskId: string, userId: string, content: string, actorName: string, parentId?: string, organizationId?: string) {
+    await this.findById(taskId, organizationId);
 
     const comment = await prisma.$transaction(async (tx) => {
       const created = await tx.taskComment.create({
@@ -312,7 +318,8 @@ class TaskService {
     return comment;
   }
 
-  async getHistory(taskId: string) {
+  async getHistory(taskId: string, organizationId?: string) {
+    await this.findById(taskId, organizationId);
     return prisma.taskHistory.findMany({
       where: { taskId },
       orderBy: { createdAt: 'desc' },

@@ -37,7 +37,7 @@ export const taskController = {
 
   async get(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const task = await taskService.findById(param(req, 'id'));
+      const task = await taskService.findById(param(req, 'id'), req.user!.organizationId);
       res.json({ data: task });
     } catch (err) {
       next(err);
@@ -68,6 +68,7 @@ export const taskController = {
         req.user!.id,
         req.user!.permissions,
         actorName,
+        req.user!.organizationId,
       );
       res.json({ data: task });
     } catch (err) {
@@ -78,7 +79,7 @@ export const taskController = {
   async remove(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const actorName = await getActorName(req.user!.id);
-      await taskService.softDelete(param(req, 'id'), req.user!.id, req.user!.permissions, actorName);
+      await taskService.softDelete(param(req, 'id'), req.user!.id, req.user!.permissions, actorName, req.user!.organizationId);
       res.status(204).send();
     } catch (err) {
       next(err);
@@ -96,6 +97,7 @@ export const taskController = {
         actorName,
         comment: req.body.comment,
         metadata: req.body.metadata,
+        organizationId: req.user!.organizationId,
       });
       res.json({ data: task });
     } catch (err) {
@@ -108,6 +110,7 @@ export const taskController = {
       const transitions = await workflowService.getAvailableTransitions(
         param(req, 'id'),
         req.user!.roles,
+        req.user!.organizationId,
       );
       res.json({ data: transitions });
     } catch (err) {
@@ -124,6 +127,7 @@ export const taskController = {
         req.body.content,
         actorName,
         req.body.parentId,
+        req.user!.organizationId,
       );
       res.status(201).json({ data: comment });
     } catch (err) {
@@ -133,7 +137,7 @@ export const taskController = {
 
   async getHistory(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const history = await taskService.getHistory(param(req, 'id'));
+      const history = await taskService.getHistory(param(req, 'id'), req.user!.organizationId);
       res.json({ data: history });
     } catch (err) {
       next(err);
