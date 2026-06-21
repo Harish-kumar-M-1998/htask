@@ -11,12 +11,18 @@ interface TransitionInput {
   actorName: string;
   comment?: string;
   metadata?: Record<string, unknown>;
+  organizationId?: string;
 }
 
 class WorkflowService {
-  async getAvailableTransitions(taskId: string, userRoles: string[]) {
-    const task = await prisma.task.findUnique({
-      where: { id: taskId },
+  async getAvailableTransitions(taskId: string, userRoles: string[], organizationId?: string) {
+    const where: any = { id: taskId };
+    if (organizationId) {
+      where.project = { organizationId };
+    }
+
+    const task = await prisma.task.findFirst({
+      where,
       include: { project: { include: { workflow: { include: { transitions: true } } } } },
     });
 
@@ -40,8 +46,13 @@ class WorkflowService {
   }
 
   async transition(input: TransitionInput) {
-    const task = await prisma.task.findUnique({
-      where: { id: input.taskId },
+    const where: any = { id: input.taskId };
+    if (input.organizationId) {
+      where.project = { organizationId: input.organizationId };
+    }
+
+    const task = await prisma.task.findFirst({
+      where,
       include: {
         project: {
           include: {

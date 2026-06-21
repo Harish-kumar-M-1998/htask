@@ -1,5 +1,6 @@
 import { config } from '../../config/index.js';
 import { formatTaskStatus } from '@htask/shared';
+import { escapeHtml } from '../../utils/helpers.js';
 
 interface TaskEmailContext {
   key: string;
@@ -37,10 +38,10 @@ function taskBlock(task: TaskEmailContext): string {
   const eta = task.estimatedHours != null ? `${task.estimatedHours}h` : '—';
   const status = task.status ? formatTaskStatus(task.status) : '';
   return `<div style="background:#f4f4f5;border-radius:8px;padding:16px;margin:16px 0">
-    <p style="margin:0 0 4px;font-family:monospace;color:#555">${task.key}</p>
-    <p style="margin:0 0 4px;font-size:16px;font-weight:600">${task.title}</p>
-    ${status ? `<p style="margin:0 0 4px;font-size:13px">Status: ${status}</p>` : ''}
-    ${task.priority ? `<p style="margin:0 0 4px;font-size:13px">Priority: ${task.priority}</p>` : ''}
+    <p style="margin:0 0 4px;font-family:monospace;color:#555">${escapeHtml(task.key)}</p>
+    <p style="margin:0 0 4px;font-size:16px;font-weight:600">${escapeHtml(task.title)}</p>
+    ${status ? `<p style="margin:0 0 4px;font-size:13px">Status: ${escapeHtml(status)}</p>` : ''}
+    ${task.priority ? `<p style="margin:0 0 4px;font-size:13px">Priority: ${escapeHtml(task.priority)}</p>` : ''}
     <p style="margin:0 0 4px;font-size:13px">Due: ${due} · ETA: ${eta}</p>
     <a href="${taskLink(task.id)}" style="color:#2563eb;font-size:13px">View task →</a>
   </div>`;
@@ -51,7 +52,7 @@ export function renderTaskCreatedEmail(task: TaskEmailContext, actorName: string
     subject: `[Htask] New task ${task.key} created`,
     html: layout(
       'Task created',
-      `<p>A new task was created by <strong>${actorName}</strong>.</p>${taskBlock(task)}`,
+      `<p>A new task was created by <strong>${escapeHtml(actorName)}</strong>.</p>${taskBlock(task)}`,
     ),
   };
 }
@@ -61,7 +62,7 @@ export function renderTaskCompletedEmail(task: TaskEmailContext, actorName: stri
     subject: `[Htask] Task ${task.key} completed`,
     html: layout(
       'Task completed',
-      `<p>Task marked complete by <strong>${actorName}</strong>.</p>${taskBlock(task)}`,
+      `<p>Task marked complete by <strong>${escapeHtml(actorName)}</strong>.</p>${taskBlock(task)}`,
     ),
   };
 }
@@ -71,7 +72,7 @@ export function renderTaskUpdatedEmail(task: TaskEmailContext, actorName: string
     subject: `[Htask] Task ${task.key} updated`,
     html: layout(
       'Task updated',
-      `<p>Task was updated by <strong>${actorName}</strong>.</p>${taskBlock(task)}`,
+      `<p>Task was updated by <strong>${escapeHtml(actorName)}</strong>.</p>${taskBlock(task)}`,
     ),
   };
 }
@@ -81,8 +82,8 @@ export function renderTaskDeletedEmail(task: TaskEmailContext, actorName: string
     subject: `[Htask] Task ${task.key} deleted`,
     html: layout(
       'Task deleted',
-      `<p>Task was deleted by <strong>${actorName}</strong>.</p>
-       <p><strong>${task.key}</strong> — ${task.title}</p>`,
+      `<p>Task was deleted by <strong>${escapeHtml(actorName)}</strong>.</p>
+       <p><strong>${escapeHtml(task.key)}</strong> — ${escapeHtml(task.title)}</p>`,
     ),
   };
 }
@@ -122,7 +123,7 @@ export function renderDailyTeamReminderEmail(user: UserEmailContext, tasks: Task
   const items = tasks
     .map(
       (t) =>
-        `<li style="margin-bottom:8px"><a href="${taskLink(t.id)}" style="color:#2563eb">${t.key}</a> — ${t.title}</li>`,
+        `<li style="margin-bottom:8px"><a href="${taskLink(t.id)}" style="color:#2563eb">${escapeHtml(t.key)}</a> — ${escapeHtml(t.title)}</li>`,
     )
     .join('');
 
@@ -130,7 +131,7 @@ export function renderDailyTeamReminderEmail(user: UserEmailContext, tasks: Task
     subject: `[Htask] Your daily task reminder (${tasks.length})`,
     html: layout(
       'Daily reminder',
-      `<p>Hi ${user.firstName},</p>
+      `<p>Hi ${escapeHtml(user.firstName)},</p>
        <p>You have <strong>${tasks.length}</strong> active task(s) today:</p>
        <ul style="padding-left:20px">${items}</ul>`,
     ),
@@ -151,7 +152,7 @@ export function renderDailyManagerDigestEmail(
     .slice(0, 15)
     .map(
       (t) =>
-        `<li style="margin-bottom:6px"><a href="${taskLink(t.id)}" style="color:#2563eb">${t.key}</a> — ${t.title}</li>`,
+        `<li style="margin-bottom:6px"><a href="${taskLink(t.id)}" style="color:#2563eb">${escapeHtml(t.key)}</a> — ${escapeHtml(t.title)}</li>`,
     )
     .join('');
 
@@ -189,11 +190,11 @@ export function renderWelcomeEmail(
     subject: '[Htask] Welcome — your account is ready',
     html: layout(
       'Welcome to Htask',
-      `<p>Hi <strong>${name}</strong>,</p>
+      `<p>Hi <strong>${escapeHtml(name)}</strong>,</p>
        <p>Your Htask team member account has been created. Use the credentials below to sign in:</p>
        <div style="background:#f4f4f5;border-radius:8px;padding:16px;margin:16px 0;font-size:14px">
          <p style="margin:0 0 8px"><strong>Email:</strong> use the address you registered with</p>
-         <p style="margin:0"><strong>Temporary password:</strong> <code style="background:#e4e4e7;padding:2px 8px;border-radius:4px;font-size:15px">${password}</code></p>
+         <p style="margin:0"><strong>Temporary password:</strong> <code style="background:#e4e4e7;padding:2px 8px;border-radius:4px;font-size:15px">${escapeHtml(password)}</code></p>
        </div>
        <p>We recommend changing your password after your first login.</p>
        <p><a href="${loginUrl}" style="display:inline-block;background:#ff9a3d;color:#1a1206;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600">Sign in to Htask</a></p>`,
