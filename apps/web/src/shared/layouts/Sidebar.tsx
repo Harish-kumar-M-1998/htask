@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router';
 import {
   LayoutDashboard, ListTodo, FolderKanban, BarChart3,
-  Search, Shield, LogOut, Moon, Sun, Users, Mail,
+  Search, Shield, LogOut, Moon, Sun, Users, Settings,
   PanelLeftClose, PanelLeft, X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -19,7 +19,7 @@ export const workspaceNav = [
 export const systemNav = [
   { to: '/search', icon: Search, label: 'Search', permission: 'search:use' },
   { to: '/audit', icon: Shield, label: 'Audit', permission: 'audit:read' },
-  { to: '/settings/email', icon: Mail, label: 'Email', managerOnly: true },
+  { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 
 type NavItem = (typeof workspaceNav)[number] | (typeof systemNav)[number];

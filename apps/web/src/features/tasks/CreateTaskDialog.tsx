@@ -9,6 +9,7 @@ import { tasksApi, projectsApi, usersApi } from '@/services/api';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { selectClassName, textareaClassName } from '@/lib/formStyles';
+import { getDefaultTaskPriority } from '@/lib/orgSettings';
 import { cn } from '@/lib/utils';
 
 const taskFormSchema = z.object({
@@ -80,7 +81,7 @@ export function CreateTaskDialog({ open, onOpenChange, defaultProjectId }: Creat
       projectId: '',
       moduleId: '',
       type: 'FEATURE',
-      priority: 'MEDIUM',
+      priority: getDefaultTaskPriority(),
       dueDate: '',
       estimatedHours: '',
       assigneeIds: [],
@@ -243,7 +244,7 @@ export function CreateTaskDialog({ open, onOpenChange, defaultProjectId }: Creat
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1.5 block">ETA (hours) *</label>
-                  <Input {...register('estimatedHours')} type="number" min={0.01} step={0.5} placeholder="e.g. 8" />
+                  <Input {...register('estimatedHours')} type="number" min={0.5} step={0.5} placeholder="e.g. 8" />
                   {errors.estimatedHours && (
                     <p className="text-destructive text-xs mt-1">{errors.estimatedHours.message}</p>
                   )}

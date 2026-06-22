@@ -16,6 +16,7 @@ export type KanbanTask = {
 interface KanbanTaskCardProps {
   task: KanbanTask;
   draggable?: boolean;
+  highlighted?: boolean;
   onClick?: () => void;
   onDragStart?: (e: React.DragEvent) => void;
   onDragEnd?: () => void;
@@ -24,6 +25,7 @@ interface KanbanTaskCardProps {
 export function KanbanTaskCard({
   task,
   draggable = false,
+  highlighted = false,
   onClick,
   onDragStart,
   onDragEnd,
@@ -41,6 +43,7 @@ export function KanbanTaskCard({
       className={cn(
         'group rounded-lg border border-border bg-card p-3 shadow-sm transition-all',
         'hover:shadow-md hover:border-primary/30 cursor-pointer',
+        highlighted && 'ring-2 ring-primary/50 border-primary/40 bg-primary/5',
         draggable && 'active:cursor-grabbing',
       )}
     >

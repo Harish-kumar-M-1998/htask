@@ -2,6 +2,7 @@ import { TaskStatus } from '@prisma/client';
 import { prisma } from '../../config/database.js';
 import { ConflictError, ForbiddenError, NotFoundError } from '../../utils/errors.js';
 import { eventBus } from '../../events/eventBus.js';
+import type { UpdateWorkflowTransitionInput } from '@htask/shared';
 
 interface TransitionInput {
   taskId: string;
@@ -14,6 +15,66 @@ interface TransitionInput {
 }
 
 class WorkflowService {
+  async findAll(organizationId: string) {
+    return prisma.workflowDefinition.findMany({
+      where: { organizationId, isActive: true },
+      include: {
+        _count: { select: { projects: true, transitions: true, states: true } },
+      },
+      orderBy: [{ isDefault: 'desc' }, { name: 'asc' }],
+    });
+  }
+
+  async getById(id: string, organizationId: string) {
+    const workflow = await prisma.workflowDefinition.findFirst({
+      where: { id, organizationId },
+      include: {
+        states: { orderBy: { sortOrder: 'asc' } },
+        transitions: { orderBy: [{ fromStatus: 'asc' }, { toStatus: 'asc' }] },
+        _count: { select: { projects: true } },
+      },
+    });
+
+    if (!workflow) throw new NotFoundError('Workflow');
+    return workflow;
+  }
+
+  async getDefaultWorkflowId(organizationId: string): Promise<string | null> {
+    const workflow = await prisma.workflowDefinition.findFirst({
+      where: { organizationId, isDefault: true, isActive: true },
+      select: { id: true },
+    });
+    return workflow?.id ?? null;
+  }
+
+  async assertWorkflowInOrg(workflowId: string, organizationId: string) {
+    const workflow = await prisma.workflowDefinition.findFirst({
+      where: { id: workflowId, organizationId, isActive: true },
+      select: { id: true },
+    });
+    if (!workflow) throw new NotFoundError('Workflow');
+    return workflow;
+  }
+
+  async updateTransition(
+    workflowId: string,
+    transitionId: string,
+    organizationId: string,
+    input: UpdateWorkflowTransitionInput,
+  ) {
+    await this.assertWorkflowInOrg(workflowId, organizationId);
+
+    const existing = await prisma.workflowTransition.findFirst({
+      where: { id: transitionId, workflowId },
+    });
+    if (!existing) throw new NotFoundError('Workflow transition');
+
+    return prisma.workflowTransition.update({
+      where: { id: transitionId },
+      data: input,
+    });
+  }
+
   async getAvailableTransitions(taskId: string, userRoles: string[]) {
     const task = await prisma.task.findUnique({
       where: { id: taskId },
@@ -91,7 +152,7 @@ class WorkflowService {
           toStatus: input.toState,
           actorId: input.userId,
           actorName: input.actorName,
-          description: input.comment || `Changed status from ${fromStatus} to ${input.toState}`,
+          description: input.comment || ('name' in transition && transition.name) || `Changed status from ${fromStatus} to ${input.toState}`,
           changes: [{ field: 'status', oldValue: fromStatus, newValue: input.toState }],
         },
       });
@@ -137,9 +198,12 @@ class WorkflowService {
     return [
       { fromStatus: 'DRAFT' as TaskStatus, toStatus: 'OPEN' as TaskStatus, name: 'Open Task', requiredRoles: ['MANAGER', 'TEAM_LEAD', 'TEAM_MEMBER'], requiresApproval: false },
       { fromStatus: 'OPEN' as TaskStatus, toStatus: 'ASSIGNED' as TaskStatus, name: 'Assign', requiredRoles: ['MANAGER', 'TEAM_LEAD'], requiresApproval: false },
+      { fromStatus: 'ASSIGNED' as TaskStatus, toStatus: 'OPEN' as TaskStatus, name: 'Return to Backlog', requiredRoles: ['MANAGER', 'TEAM_LEAD', 'TEAM_MEMBER'], requiresApproval: false },
       { fromStatus: 'ASSIGNED' as TaskStatus, toStatus: 'IN_PROGRESS' as TaskStatus, name: 'Start Work', requiredRoles: ['MANAGER', 'TEAM_LEAD', 'TEAM_MEMBER'], requiresApproval: false },
       { fromStatus: 'IN_PROGRESS' as TaskStatus, toStatus: 'BLOCKED' as TaskStatus, name: 'Block', requiredRoles: ['MANAGER', 'TEAM_LEAD', 'TEAM_MEMBER'], requiresApproval: false },
       { fromStatus: 'BLOCKED' as TaskStatus, toStatus: 'IN_PROGRESS' as TaskStatus, name: 'Unblock', requiredRoles: ['MANAGER', 'TEAM_LEAD', 'TEAM_MEMBER'], requiresApproval: false },
+      { fromStatus: 'IN_PROGRESS' as TaskStatus, toStatus: 'OPEN' as TaskStatus, name: 'Return to Backlog', requiredRoles: ['MANAGER', 'TEAM_LEAD', 'TEAM_MEMBER'], requiresApproval: false },
+      { fromStatus: 'BLOCKED' as TaskStatus, toStatus: 'OPEN' as TaskStatus, name: 'Return to Backlog', requiredRoles: ['MANAGER', 'TEAM_LEAD', 'TEAM_MEMBER'], requiresApproval: false },
       { fromStatus: 'IN_PROGRESS' as TaskStatus, toStatus: 'DEVELOPMENT_COMPLETE' as TaskStatus, name: 'Complete Development', requiredRoles: ['MANAGER', 'TEAM_LEAD', 'TEAM_MEMBER'], requiresApproval: false },
       { fromStatus: 'DEVELOPMENT_COMPLETE' as TaskStatus, toStatus: 'MR_RAISED' as TaskStatus, name: 'Raise MR', requiredRoles: ['MANAGER', 'TEAM_LEAD', 'TEAM_MEMBER'], requiresApproval: false },
       { fromStatus: 'MR_RAISED' as TaskStatus, toStatus: 'MR_APPROVED' as TaskStatus, name: 'Approve MR', requiredRoles: ['MANAGER', 'TEAM_LEAD'], requiresApproval: true },

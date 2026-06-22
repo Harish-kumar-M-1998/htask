@@ -14,6 +14,7 @@ import { CreateTeamMemberDialog } from '@/features/team/CreateTeamMemberDialog';
 import { EditTeamMemberRoleDialog } from '@/features/team/EditTeamMemberRoleDialog';
 import { TeamFilterDialog, emptyTeamFilters, type TeamFilters } from '@/features/team/TeamFilterDialog';
 import { CardGridSkeleton } from '@/shared/components/skeletons';
+import { useDebounce } from '@/lib/useDebounce';
 
 type TeamMember = {
   id: string;
@@ -36,13 +37,14 @@ export function TeamPage() {
   const [roleEditTarget, setRoleEditTarget] = useState<TeamMember | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 300);
   const [filters, setFilters] = useState<TeamFilters>(emptyTeamFilters);
   const [deleteTarget, setDeleteTarget] = useState<TeamMember | null>(null);
   const [deleteError, setDeleteError] = useState('');
 
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ['users', search],
-    queryFn: () => usersApi.list({ search, limit: 100 }).then((r) => r.data),
+    queryKey: ['users', debouncedSearch],
+    queryFn: () => usersApi.list({ search: debouncedSearch, limit: 100 }).then((r) => r.data),
   });
 
   const deleteMutation = useMutation({

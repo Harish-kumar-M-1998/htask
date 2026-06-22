@@ -1,5 +1,5 @@
 import { formatDate, formatRelativeTime } from '@/lib/utils';
-import { formatTaskStatus } from '@htask/shared';
+import { formatTransitionActivityMessage } from '@/lib/kanbanColumns';
 
 interface HistoryEntry {
   id: string;
@@ -14,7 +14,7 @@ interface HistoryEntry {
 
 function formatActivityMessage(entry: HistoryEntry): string {
   if (entry.action === 'TRANSITION' && entry.fromStatus && entry.toStatus) {
-    return `Changed status from ${formatTaskStatus(entry.fromStatus)} to ${formatTaskStatus(entry.toStatus)}`;
+    return formatTransitionActivityMessage(entry.fromStatus, entry.toStatus);
   }
 
   if (entry.description) {

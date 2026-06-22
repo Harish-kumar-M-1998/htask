@@ -1,12 +1,27 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
+import { getOrgSettings } from './orgSettings';
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 export function formatDate(date: string | Date): string {
-  return new Date(date).toLocaleDateString('en-US', {
+  const d = new Date(date);
+  const dateFormat = getOrgSettings()?.dateFormat ?? 'MMM d, yyyy';
+
+  if (dateFormat === 'dd/MM/yyyy') {
+    return d.toLocaleDateString('en-GB');
+  }
+  if (dateFormat === 'yyyy-MM-dd') {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  return d.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',

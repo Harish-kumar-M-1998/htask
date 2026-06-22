@@ -182,7 +182,7 @@ export function EditTaskDialog({ open, onOpenChange, task }: EditTaskDialogProps
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1.5 block">ETA (hours)</label>
-                  <Input {...register('estimatedHours')} type="number" min={0} step={0.5} placeholder="e.g. 8" />
+                  <Input {...register('estimatedHours')} type="number" min={0.5} step={0.5} placeholder="e.g. 8" />
                 </div>
               </div>
 

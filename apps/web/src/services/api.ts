@@ -105,6 +105,9 @@ export const notificationsApi = {
   list: (page?: number) => api.get('/notifications', { params: { page } }),
   markRead: (id: string) => api.patch(`/notifications/${id}/read`),
   markAllRead: () => api.patch('/notifications/read-all'),
+  getPreferences: () => api.get('/notifications/preferences'),
+  updatePreferences: (preferences: Array<{ event: string; inApp: boolean }>) =>
+    api.patch('/notifications/preferences', { preferences }),
   getEmailConfig: () => api.get('/notifications/email-config'),
   getSmtpStatus: () => api.get('/notifications/email-config/smtp-status'),
   updateEmailConfig: (data: Record<string, unknown>) =>
@@ -112,6 +115,28 @@ export const notificationsApi = {
   sendTestEmail: () => api.post('/notifications/email-config/test'),
   runDailyEmails: () => api.post('/notifications/email-config/run-daily'),
   runEmailChecks: () => api.post('/notifications/email-config/run-checks'),
+};
+
+export const organizationApi = {
+  getCurrent: () => api.get('/organizations/current'),
+  update: (data: Record<string, unknown>) => api.patch('/organizations/current', data),
+};
+
+export const rolesApi = {
+  list: () => api.get('/roles'),
+  listPermissions: () => api.get('/permissions'),
+  create: (data: Record<string, unknown>) => api.post('/roles', data),
+  update: (id: string, data: Record<string, unknown>) => api.patch(`/roles/${id}`, data),
+  updatePermissions: (id: string, data: { permissionCodes: string[] }) =>
+    api.patch(`/roles/${id}/permissions`, data),
+  remove: (id: string) => api.delete(`/roles/${id}`),
+};
+
+export const workflowsApi = {
+  list: () => api.get('/workflows'),
+  get: (id: string) => api.get(`/workflows/${id}`),
+  updateTransition: (workflowId: string, transitionId: string, data: Record<string, unknown>) =>
+    api.patch(`/workflows/${workflowId}/transitions/${transitionId}`, data),
 };
 
 export const searchApi = {

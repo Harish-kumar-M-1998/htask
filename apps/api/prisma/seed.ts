@@ -52,7 +52,10 @@ const DEFAULT_TRANSITIONS: Array<{
 }> = [
   { from: 'DRAFT', to: 'OPEN', name: 'Open Task', roles: ['MANAGER', 'TEAM_LEAD', 'TEAM_MEMBER'] },
   { from: 'OPEN', to: 'ASSIGNED', name: 'Assign', roles: ['MANAGER', 'TEAM_LEAD'] },
+  { from: 'ASSIGNED', to: 'OPEN', name: 'Return to Backlog', roles: ['MANAGER', 'TEAM_LEAD', 'TEAM_MEMBER'] },
   { from: 'ASSIGNED', to: 'IN_PROGRESS', name: 'Start Work', roles: ['MANAGER', 'TEAM_LEAD', 'TEAM_MEMBER'] },
+  { from: 'IN_PROGRESS', to: 'OPEN', name: 'Return to Backlog', roles: ['MANAGER', 'TEAM_LEAD', 'TEAM_MEMBER'] },
+  { from: 'BLOCKED', to: 'OPEN', name: 'Return to Backlog', roles: ['MANAGER', 'TEAM_LEAD', 'TEAM_MEMBER'] },
   { from: 'IN_PROGRESS', to: 'DEVELOPMENT_COMPLETE', name: 'Complete Dev', roles: ['MANAGER', 'TEAM_LEAD', 'TEAM_MEMBER'] },
   { from: 'DEVELOPMENT_COMPLETE', to: 'MR_RAISED', name: 'Raise MR', roles: ['MANAGER', 'TEAM_LEAD', 'TEAM_MEMBER'] },
   { from: 'MR_RAISED', to: 'MR_APPROVED', name: 'Approve MR', roles: ['MANAGER', 'TEAM_LEAD'] },

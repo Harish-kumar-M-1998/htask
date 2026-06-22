@@ -3,10 +3,13 @@ import { NotFoundError } from '../../utils/errors.js';
 import { auditService } from '../audit/audit.service.js';
 import { toJsonValue } from '../../utils/helpers.js';
 import type { CreateProjectInput } from '@htask/shared';
+import { workflowService } from '../workflow/workflow.service.js';
+import { organizationService } from '../organization/organization.service.js';
 
 type UpdateProjectInput = Partial<CreateProjectInput> & {
   status?: 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'ARCHIVED';
   memberIds?: string[];
+  workflowId?: string | null;
 };
 
 class ProjectService {
@@ -70,6 +73,14 @@ class ProjectService {
     actorName: string,
   ) {
     const memberIds = [...new Set([userId, ...(input.memberIds ?? [])])];
+    const workflowId =
+      input.workflowId ??
+      (await organizationService.resolveDefaultWorkflowId(organizationId)) ??
+      undefined;
+
+    if (input.workflowId) {
+      await workflowService.assertWorkflowInOrg(input.workflowId, organizationId);
+    }
 
     const project = await prisma.project.create({
       data: {
@@ -79,6 +90,7 @@ class ProjectService {
         description: input.description,
         startDate: input.startDate ? new Date(input.startDate) : undefined,
         endDate: input.endDate ? new Date(input.endDate) : undefined,
+        workflowId,
         createdById: userId,
         members: {
           create: memberIds.map((uid) => ({
@@ -118,8 +130,13 @@ class ProjectService {
       key: existing.key,
       description: existing.description,
       status: existing.status,
+      workflowId: existing.workflowId,
       members: existing.members.map((m) => m.userId),
     };
+
+    if (input.workflowId) {
+      await workflowService.assertWorkflowInOrg(input.workflowId, organizationId);
+    }
 
     const project = await prisma.$transaction(async (tx) => {
       const updated = await tx.project.update({
@@ -131,6 +148,7 @@ class ProjectService {
           ...(input.status && { status: input.status }),
           ...(input.startDate && { startDate: new Date(input.startDate) }),
           ...(input.endDate && { endDate: new Date(input.endDate) }),
+          ...(input.workflowId !== undefined && { workflowId: input.workflowId }),
         },
         include: {
           members: { include: { user: { select: { id: true, firstName: true, lastName: true, email: true } } } },
@@ -167,6 +185,9 @@ class ProjectService {
           : []),
         ...(input.memberIds
           ? [{ field: 'members', oldValue: oldSnapshot.members, newValue: input.memberIds }]
+          : []),
+        ...(input.workflowId !== undefined && input.workflowId !== oldSnapshot.workflowId
+          ? [{ field: 'workflowId', oldValue: oldSnapshot.workflowId, newValue: input.workflowId }]
           : []),
       ],
     );

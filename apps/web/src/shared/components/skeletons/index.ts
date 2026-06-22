@@ -9,3 +9,4 @@ export { EmailSettingsSkeleton } from './EmailSettingsSkeleton';
 export { SearchResultsSkeleton } from './SearchResultsSkeleton';
 export { PageRouteSkeleton } from './PageRouteSkeleton';
 export { KanbanSkeleton } from './KanbanSkeleton';
+export { WorkflowSettingsSkeleton } from './WorkflowSettingsSkeleton';

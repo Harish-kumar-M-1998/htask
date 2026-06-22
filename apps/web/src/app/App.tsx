@@ -19,7 +19,25 @@ const MemberPerformancePage = lazy(() =>
 );
 const ReportsPage = lazy(() => import('@/pages/ReportsPage').then((m) => ({ default: m.ReportsPage })));
 const AuditPage = lazy(() => import('@/pages/AuditPage').then((m) => ({ default: m.AuditPage })));
-const EmailSettingsPage = lazy(() => import('@/pages/EmailSettingsPage').then((m) => ({ default: m.EmailSettingsPage })));
+const SettingsLayout = lazy(() => import('@/pages/settings/SettingsLayout').then((m) => ({ default: m.SettingsLayout })));
+const GeneralSettingsPage = lazy(() =>
+  import('@/pages/settings/GeneralSettingsPage').then((m) => ({ default: m.GeneralSettingsPage })),
+);
+const AppearanceSettingsPage = lazy(() =>
+  import('@/pages/settings/AppearanceSettingsPage').then((m) => ({ default: m.AppearanceSettingsPage })),
+);
+const NotificationsSettingsPage = lazy(() =>
+  import('@/pages/settings/NotificationsSettingsPage').then((m) => ({ default: m.NotificationsSettingsPage })),
+);
+const RolesSettingsPage = lazy(() =>
+  import('@/pages/settings/RolesSettingsPage').then((m) => ({ default: m.RolesSettingsPage })),
+);
+const WorkflowSettingsPage = lazy(() =>
+  import('@/pages/settings/WorkflowSettingsPage').then((m) => ({ default: m.WorkflowSettingsPage })),
+);
+const SecuritySettingsPage = lazy(() =>
+  import('@/pages/settings/SecuritySettingsPage').then((m) => ({ default: m.SecuritySettingsPage })),
+);
 const SearchPage = lazy(() => import('@/pages/SearchPage').then((m) => ({ default: m.SearchPage })));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
 
@@ -140,13 +158,63 @@ export function App() {
                 }
               />
               <Route
-                path="settings/email"
+                path="settings"
                 element={
                   <Suspense fallback={<PageLoader />}>
-                    <EmailSettingsPage />
+                    <SettingsLayout />
                   </Suspense>
                 }
-              />
+              >
+                <Route
+                  path="general"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <GeneralSettingsPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="appearance"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <AppearanceSettingsPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="notifications"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <NotificationsSettingsPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="workflow"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <WorkflowSettingsPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="security"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <SecuritySettingsPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="roles"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <RolesSettingsPage />
+                    </Suspense>
+                  }
+                />
+              </Route>
+              <Route path="settings/email" element={<Navigate to="/settings/notifications" replace />} />
               <Route
                 path="search"
                 element={

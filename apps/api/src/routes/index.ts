@@ -15,8 +15,17 @@ import {
   createUserSchema,
   updateUserRolesSchema,
   updateProjectSchema,
+  updateWorkflowTransitionSchema,
+  updateOrganizationSchema,
+  createRoleSchema,
+  updateRoleSchema,
+  updateRolePermissionsSchema,
+  updateNotificationPreferencesSchema,
 } from '@htask/shared';
 import { projectController } from '../controllers/project.controller.js';
+import { workflowController } from '../controllers/workflow.controller.js';
+import { organizationController } from '../controllers/organization.controller.js';
+import { roleController } from '../controllers/role.controller.js';
 import { taskController } from '../controllers/task.controller.js';
 import { userController } from '../controllers/user.controller.js';
 import { AuthRequest } from '../middleware/auth.js';
@@ -25,6 +34,7 @@ import { worklogService } from '../services/worklog/worklog.service.js';
 import { analyticsService } from '../services/analytics/analytics.service.js';
 import { auditService } from '../services/audit/audit.service.js';
 import { notificationService } from '../services/notification/notification.service.js';
+import { notificationPreferenceService } from '../services/notification/notificationPreference.service.js';
 import { reportService, searchService } from '../services/report/report.service.js';
 import { emailConfigService } from '../services/email/emailConfig.service.js';
 import { emailService } from '../services/email/email.service.js';
@@ -43,6 +53,30 @@ import { storageService } from '../services/storage/storage.service.js';
 
 const router = Router();
 
+// Organization
+router.get('/organizations/current', authenticate, organizationController.getCurrent);
+router.patch(
+  '/organizations/current',
+  authenticate,
+  requireRole('MANAGER'),
+  validate(updateOrganizationSchema),
+  organizationController.update,
+);
+
+// Roles
+router.get('/roles', authenticate, requirePermission('user:read'), roleController.list);
+router.get('/permissions', authenticate, requirePermission('user:manage_roles'), roleController.listPermissions);
+router.post('/roles', authenticate, requirePermission('user:manage_roles'), validate(createRoleSchema), roleController.create);
+router.patch('/roles/:id', authenticate, requirePermission('user:manage_roles'), validate(updateRoleSchema), roleController.update);
+router.patch(
+  '/roles/:id/permissions',
+  authenticate,
+  requirePermission('user:manage_roles'),
+  validate(updateRolePermissionsSchema),
+  roleController.updatePermissions,
+);
+router.delete('/roles/:id', authenticate, requirePermission('user:manage_roles'), roleController.remove);
+
 // Users
 router.get('/users', authenticate, requirePermission('user:read'), validate(paginationSchema, 'query'), userController.list);
 router.post('/users', authenticate, requirePermission('user:create'), validate(createUserSchema), userController.create);
@@ -57,6 +91,17 @@ router.patch('/projects/:id', authenticate, requirePermission('project:update'),
 router.delete('/projects/:id', authenticate, requirePermission('project:delete'), projectController.remove);
 router.get('/projects/:id/history', authenticate, requirePermission('project:read'), projectController.getHistory);
 router.post('/projects/:id/modules', authenticate, requirePermission('project:update'), projectController.createModule);
+
+// Workflows
+router.get('/workflows', authenticate, requirePermission('workflow:read'), workflowController.list);
+router.get('/workflows/:id', authenticate, requirePermission('workflow:read'), workflowController.get);
+router.patch(
+  '/workflows/:id/transitions/:transitionId',
+  authenticate,
+  requirePermission('workflow:manage'),
+  validate(updateWorkflowTransitionSchema),
+  workflowController.updateTransition,
+);
 
 // Tasks
 router.get('/tasks', authenticate, requirePermission('task:read'), taskController.list);
@@ -194,6 +239,28 @@ router.patch('/notifications/read-all', authenticate, async (req: AuthRequest, r
     res.status(204).send();
   } catch (err) { next(err); }
 });
+
+router.get('/notifications/preferences', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const prefs = await notificationPreferenceService.getForUser(req.user!.id);
+    res.json({ data: prefs });
+  } catch (err) { next(err); }
+});
+
+router.patch(
+  '/notifications/preferences',
+  authenticate,
+  validate(updateNotificationPreferencesSchema),
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const prefs = await notificationPreferenceService.updateForUser(
+        req.user!.id,
+        req.body.preferences,
+      );
+      res.json({ data: prefs });
+    } catch (err) { next(err); }
+  },
+);
 
 // Email automation config (manager only)
 router.get('/notifications/email-config', authenticate, requireRole('MANAGER'), async (req: AuthRequest, res: Response, next: NextFunction) => {

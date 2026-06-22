@@ -7,15 +7,17 @@ import { Input } from '@/shared/ui/input';
 import { formToolbarClass } from '@/lib/formStyles';
 import { Card, CardContent } from '@/shared/ui/card';
 import { SearchResultsSkeleton } from '@/shared/components/skeletons';
+import { useDebounce } from '@/lib/useDebounce';
 
 export function SearchPage() {
   const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 300);
   const navigate = useNavigate();
 
   const { data, isFetching } = useQuery({
-    queryKey: ['search', query],
-    queryFn: () => searchApi.search(query).then((r) => r.data.data),
-    enabled: query.length >= 2,
+    queryKey: ['search', debouncedQuery],
+    queryFn: () => searchApi.search(debouncedQuery).then((r) => r.data.data),
+    enabled: debouncedQuery.length >= 2,
   });
 
   const results = data ?? [];
@@ -62,7 +64,7 @@ export function SearchPage() {
         </Card>
       )}
 
-      {query.length >= 2 && !isFetching && results.length === 0 && (
+      {debouncedQuery.length >= 2 && !isFetching && results.length === 0 && (
         <p className="text-sm text-muted-foreground text-center">No results found</p>
       )}
     </div>

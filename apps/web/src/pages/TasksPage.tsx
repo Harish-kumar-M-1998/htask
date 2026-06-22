@@ -17,6 +17,7 @@ import {
   type TaskFilters,
 } from '@/features/tasks/TaskFilterDialog';
 import { exportTasksToCsv, exportTasksToXlsx, type ExportableTask } from '@/lib/exportTasks';
+import { useDebounce } from '@/lib/useDebounce';
 import { PageShell } from '@/shared/layouts/PageShell';
 import { FilterCountBadge } from '@/shared/components/FilterCountBadge';
 import { formToolbarClass } from '@/lib/formStyles';
@@ -45,6 +46,7 @@ async function fetchAllFilteredTasks(
 export function TasksPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 300);
   const [createOpen, setCreateOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -70,10 +72,10 @@ export function TasksPage() {
   const users = usersData?.data ?? [];
 
   const { data, isLoading } = useQuery({
-    queryKey: ['tasks', search, filters],
+    queryKey: ['tasks', debouncedSearch, filters],
     queryFn: () =>
       tasksApi
-        .list(buildTaskListParams(search, filters, 1, KANBAN_TASK_LIMIT))
+        .list(buildTaskListParams(debouncedSearch, filters, 1, KANBAN_TASK_LIMIT))
         .then((r) => r.data),
   });
 
@@ -88,7 +90,7 @@ export function TasksPage() {
   const handleExport = async (format: 'csv' | 'xlsx') => {
     setExporting(true);
     try {
-      const allTasks = await fetchAllFilteredTasks(search, filters);
+      const allTasks = await fetchAllFilteredTasks(debouncedSearch, filters);
       const stamp = new Date().toISOString().slice(0, 10);
       if (format === 'csv') {
         exportTasksToCsv(allTasks, `tasks-${stamp}.csv`);
@@ -197,6 +199,7 @@ export function TasksPage() {
           ) : (
             <TaskKanbanBoard
               tasks={tasks}
+              searchQuery={debouncedSearch}
               onTaskClick={(id) => navigate(`/tasks/${id}`)}
               canTransition={canTransition}
             />

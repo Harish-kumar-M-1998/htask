@@ -6,7 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createProjectSchema, updateProjectSchema, type CreateProjectInput } from '@htask/shared';
 import { z } from 'zod';
 import { X } from 'lucide-react';
-import { projectsApi, usersApi } from '@/services/api';
+import { projectsApi, usersApi, workflowsApi } from '@/services/api';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { textareaClassName } from '@/lib/formStyles';
@@ -27,6 +27,7 @@ interface ProjectFormDialogProps {
     name: string;
     key: string;
     description?: string | null;
+    workflowId?: string | null;
     members?: Array<{ userId: string }>;
   };
 }
@@ -41,7 +42,15 @@ export function ProjectFormDialog({ open, onOpenChange, mode, project }: Project
     enabled: open,
   });
 
+  const { data: workflowsData } = useQuery({
+    queryKey: ['workflows'],
+    queryFn: () => workflowsApi.list().then((r) => r.data.data as Array<{ id: string; name: string; isDefault: boolean }>),
+    enabled: open,
+  });
+
   const users = usersData?.data ?? [];
+  const workflows = workflowsData ?? [];
+  const defaultWorkflowId = workflows.find((w) => w.isDefault)?.id ?? workflows[0]?.id;
 
   const {
     register,
@@ -56,6 +65,7 @@ export function ProjectFormDialog({ open, onOpenChange, mode, project }: Project
       key: '',
       description: '',
       memberIds: [],
+      workflowId: undefined,
     },
   });
 
@@ -66,11 +76,18 @@ export function ProjectFormDialog({ open, onOpenChange, mode, project }: Project
         key: project.key,
         description: project.description ?? '',
         memberIds: project.members?.map((m) => m.userId) ?? [],
+        workflowId: project.workflowId ?? defaultWorkflowId,
       });
     } else if (open && !isEdit) {
-      reset({ name: '', key: '', description: '', memberIds: [] });
+      reset({
+        name: '',
+        key: '',
+        description: '',
+        memberIds: [],
+        workflowId: defaultWorkflowId,
+      });
     }
-  }, [open, isEdit, project, reset]);
+  }, [open, isEdit, project, reset, defaultWorkflowId]);
 
   const mutation = useMutation({
     mutationFn: (data: ProjectFormValues) => {
@@ -152,6 +169,26 @@ export function ProjectFormDialog({ open, onOpenChange, mode, project }: Project
               </div>
 
               <TeamMemberSelect control={control as unknown as Control<{ memberIds?: string[] }>} users={users} />
+
+              {workflows.length > 0 && (
+                <div>
+                  <label className="text-sm font-medium mb-1.5 block">Workflow</label>
+                  <select
+                    {...register('workflowId')}
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                  >
+                    {workflows.map((wf) => (
+                      <option key={wf.id} value={wf.id}>
+                        {wf.name}
+                        {wf.isDefault ? ' (default)' : ''}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Defines task status transitions for this project.
+                  </p>
+                </div>
+              )}
 
               {mutation.isError && (
                 <p className="text-destructive text-sm">

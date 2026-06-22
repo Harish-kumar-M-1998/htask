@@ -14,6 +14,9 @@ const RESOURCE_SEGMENTS: Record<string, string> = {
   worklogs: 'worklog',
   reports: 'report',
   notifications: 'notification',
+  workflows: 'workflow',
+  organizations: 'organization',
+  permissions: 'permission',
 };
 
 export function requestId(
@@ -87,6 +90,7 @@ function mapMethodToAction(method: string, path: string): string | null {
   if (path.includes('/auth/login')) return 'USER_LOGIN';
   if (path.includes('/auth/logout')) return 'USER_LOGOUT';
   if (path.includes('/notifications/email-config') && method === 'PATCH') return 'PERMISSION_UPDATED';
+  if (path.includes('/notifications/preferences') && method === 'PATCH') return null;
   if (path.includes('/transition')) return 'TASK_TRANSITIONED';
   if (path.includes('/comments')) return 'COMMENT_ADDED';
   if (path.includes('/attachments')) return 'FILE_UPLOADED';
@@ -108,6 +112,7 @@ function mapMethodToAction(method: string, path: string): string | null {
 const VALID_AUDIT_ACTIONS = new Set([
   'USER_LOGIN', 'USER_LOGOUT', 'USER_LOGIN_FAILED', 'TOKEN_REFRESHED', 'PASSWORD_CHANGED',
   'PROJECT_CREATED', 'PROJECT_UPDATED', 'PROJECT_DELETED',
+  'ORGANIZATION_UPDATED',
   'MODULE_CREATED', 'MODULE_UPDATED', 'MODULE_DELETED',
   'TASK_CREATED', 'TASK_UPDATED', 'TASK_DELETED', 'TASK_TRANSITIONED', 'TASK_ASSIGNED',
   'COMMENT_ADDED', 'COMMENT_UPDATED', 'COMMENT_DELETED',
@@ -116,7 +121,7 @@ const VALID_AUDIT_ACTIONS = new Set([
   'ROLE_CHANGED', 'PERMISSION_UPDATED',
   'USER_CREATED', 'USER_UPDATED', 'USER_DEACTIVATED',
   'REPORT_GENERATED', 'REPORT_EXPORTED',
-  'WORKFLOW_APPROVED', 'WORKFLOW_REJECTED',
+  'WORKFLOW_APPROVED', 'WORKFLOW_REJECTED', 'WORKFLOW_UPDATED',
   'RELEASE_CREATED', 'RELEASE_UPDATED',
   'BACKLOG_CREATED', 'BACKLOG_UPDATED',
 ]);

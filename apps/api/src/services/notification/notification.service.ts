@@ -1,6 +1,7 @@
 import { prisma } from '../../config/database.js';
 import { eventBus } from '../../events/eventBus.js';
 import { logger } from '../../config/logger.js';
+import { notificationPreferenceService } from './notificationPreference.service.js';
 
 class NotificationService {
   constructor() {
@@ -29,6 +30,9 @@ class NotificationService {
         .filter((id) => id !== actorId);
 
       for (const userId of recipientIds) {
+        const enabled = await notificationPreferenceService.isInAppEnabled(userId, eventType);
+        if (!enabled) continue;
+
         await this.createInAppNotification(userId, eventType, {
           title: this.getTitle(eventType, task),
           body: task.title,

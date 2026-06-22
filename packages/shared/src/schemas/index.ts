@@ -44,6 +44,7 @@ export const createProjectSchema = z.object({
   startDate: z.string().optional(),
   endDate: z.string().optional(),
   memberIds: z.array(z.string().uuid()).optional(),
+  workflowId: z.string().uuid().optional(),
 });
 
 export const updateProjectSchema = z.object({
@@ -54,6 +55,7 @@ export const updateProjectSchema = z.object({
   endDate: z.string().optional(),
   status: z.enum(['ACTIVE', 'ON_HOLD', 'COMPLETED', 'ARCHIVED']).optional(),
   memberIds: z.array(z.string().uuid()).optional(),
+  workflowId: z.string().uuid().nullable().optional(),
 });
 
 export const createModuleSchema = z.object({
@@ -151,6 +153,63 @@ export const emailAutomationConfigSchema = z.object({
 });
 
 export type EmailAutomationConfig = z.infer<typeof emailAutomationConfigSchema>;
+
+const WORKFLOW_ROLE_CODES = ['MANAGER', 'TEAM_LEAD', 'TEAM_MEMBER', 'PMO', 'QA'] as const;
+
+export const updateWorkflowTransitionSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  requiredRoles: z.array(z.enum(WORKFLOW_ROLE_CODES)).min(1).optional(),
+  requiresApproval: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+});
+
+export type UpdateWorkflowTransitionInput = z.infer<typeof updateWorkflowTransitionSchema>;
+
+export const organizationGeneralSettingsSchema = z.object({
+  timezone: z.string().min(1).default('UTC'),
+  dateFormat: z.enum(['MMM d, yyyy', 'dd/MM/yyyy', 'yyyy-MM-dd']).default('MMM d, yyyy'),
+  defaultTaskPriority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']).default('MEDIUM'),
+  defaultWorkflowId: z.string().uuid().nullable().optional(),
+});
+
+export const updateOrganizationSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  general: organizationGeneralSettingsSchema.partial().optional(),
+});
+
+export type OrganizationGeneralSettings = z.infer<typeof organizationGeneralSettingsSchema>;
+export type UpdateOrganizationInput = z.infer<typeof updateOrganizationSchema>;
+
+export const createRoleSchema = z.object({
+  name: z.string().min(1).max(100),
+  code: z.string().min(2).max(50).regex(/^[A-Z][A-Z0-9_]*$/, 'Use uppercase letters, numbers, underscores'),
+  description: z.string().max(500).optional(),
+  permissionCodes: z.array(z.string()).min(1, 'Select at least one permission'),
+});
+
+export const updateRoleSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  description: z.string().max(500).nullable().optional(),
+});
+
+export const updateRolePermissionsSchema = z.object({
+  permissionCodes: z.array(z.string()).min(1, 'Select at least one permission'),
+});
+
+export const notificationPreferenceItemSchema = z.object({
+  event: z.string(),
+  inApp: z.boolean(),
+  email: z.boolean().optional(),
+});
+
+export const updateNotificationPreferencesSchema = z.object({
+  preferences: z.array(notificationPreferenceItemSchema).min(1),
+});
+
+export type CreateRoleInput = z.infer<typeof createRoleSchema>;
+export type UpdateRoleInput = z.infer<typeof updateRoleSchema>;
+export type UpdateRolePermissionsInput = z.infer<typeof updateRolePermissionsSchema>;
+export type UpdateNotificationPreferencesInput = z.infer<typeof updateNotificationPreferencesSchema>;
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 export type UpdateUserRolesInput = z.infer<typeof updateUserRolesSchema>;

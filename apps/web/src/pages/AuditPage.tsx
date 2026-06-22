@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Filter } from 'lucide-react';
+import { Filter, Download } from 'lucide-react';
 import { auditApi, usersApi } from '@/services/api';
 import { PageShell } from '@/shared/layouts/PageShell';
 import { Button } from '@/shared/ui/button';
@@ -16,6 +16,7 @@ import {
 } from '@/features/audit/auditFilters';
 import { FilterCountBadge } from '@/shared/components/FilterCountBadge';
 import { formToolbarClass } from '@/lib/formStyles';
+import { exportAuditToCsv } from '@/features/audit/exportAudit';
 
 export function AuditPage() {
   const [page, setPage] = useState(1);
@@ -53,12 +54,23 @@ export function AuditPage() {
     setPage(1);
   };
 
+  const handleExport = async () => {
+    const result = await auditApi
+      .list({ page: 1, limit: 500, ...auditFiltersToParams(filters) })
+      .then((r) => r.data);
+    exportAuditToCsv((result.data ?? []) as AuditLogRow[]);
+  };
+
   return (
     <PageShell
       title="Audit Log"
       subtitle={`${meta.total} records${activeFilterCount ? ` · ${activeFilterCount} filter${activeFilterCount > 1 ? 's' : ''} applied` : ''}`}
       action={
         <div className={`${formToolbarClass}`}>
+          <Button variant="outline" size="sm" onClick={() => void handleExport()}>
+            <Download className="h-4 w-4" />
+            Export CSV
+          </Button>
           <Button variant="outline" size="sm" onClick={() => setFilterOpen(true)} className="relative">
             <Filter className="h-4 w-4" />
             Filters

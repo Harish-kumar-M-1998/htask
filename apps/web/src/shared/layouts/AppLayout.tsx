@@ -1,8 +1,11 @@
 import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Outlet, useNavigate, useLocation } from 'react-router';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { isTeamMemberOnly } from '@/lib/auth';
+import { setOrgSettings } from '@/lib/orgSettings';
+import { organizationApi } from '@/services/api';
 import { useAuthStore, useUIStore } from '@/store';
 import { SidebarContent } from '@/shared/layouts/Sidebar';
 import { applyAppearance } from '@/lib/appearance';
@@ -16,6 +19,19 @@ export function AppLayout() {
 
   const teamMemberOnly = isTeamMemberOnly(user);
   const permissions = user?.permissions ?? [];
+
+  const { data: orgData } = useQuery({
+    queryKey: ['organization'],
+    queryFn: () => organizationApi.getCurrent().then((r) => r.data.data),
+    staleTime: 5 * 60_000,
+  });
+
+  useEffect(() => {
+    if (orgData?.general) {
+      setOrgSettings(orgData.general);
+    }
+  }, [orgData]);
+
   const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   useEffect(() => {

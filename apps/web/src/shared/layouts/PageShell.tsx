@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react';
 import { NotificationBell } from '@/shared/components/NotificationBell';
 import { WidgetTrigger } from '@/shared/components/WidgetTrigger';
-import { WidgetPanel } from '@/shared/components/WidgetPanel';
-
 interface PageShellProps {
   title: string;
   subtitle?: string;
@@ -29,7 +27,6 @@ export function PageShell({ title, subtitle, children, action }: PageShellProps)
       <div className="flex flex-1 min-h-0 min-w-0 flex-col">
         {children}
       </div>
-      <WidgetPanel />
     </div>
   );
 }

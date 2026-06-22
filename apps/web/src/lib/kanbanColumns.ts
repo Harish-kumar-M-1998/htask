@@ -1,4 +1,4 @@
-import { TASK_STATUSES } from '@htask/shared';
+import { TASK_STATUSES, formatTaskStatus } from '@htask/shared';
 
 export type KanbanColumn = {
   id: string;
@@ -85,4 +85,19 @@ export function groupTasksByKanbanColumn<T extends { status: string }>(
 
 export function isKnownKanbanStatus(status: string): boolean {
   return (TASK_STATUSES as readonly string[]).includes(status);
+}
+
+export function formatKanbanColumnTitle(status: string): string {
+  return getKanbanColumnForStatus(status).title;
+}
+
+export function formatTransitionActivityMessage(fromStatus: string, toStatus: string): string {
+  const fromColumn = getKanbanColumnForStatus(fromStatus);
+  const toColumn = getKanbanColumnForStatus(toStatus);
+
+  if (fromColumn.id === toColumn.id) {
+    return `Changed status from ${formatTaskStatus(fromStatus)} to ${formatTaskStatus(toStatus)}`;
+  }
+
+  return `Moved from ${fromColumn.title} to ${toColumn.title}`;
 }
